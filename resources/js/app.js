@@ -3,9 +3,12 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-// require('./bootstrap');
+require('./bootstrap');
 import '@coreui/coreui';
 import '@coreui/coreui/dist/css/coreui.min.css';
+import '@coreui/icons/css/free.min.css';
+import '@fortawesome/fontawesome-free/js/all.min'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 
 window.Vue = require('vue');
 
