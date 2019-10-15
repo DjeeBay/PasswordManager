@@ -1,44 +1,33 @@
 <div class="sidebar">
     <nav class="sidebar-nav">
         <ul class="nav">
-            <li class="nav-title">Nav Title</li>
+            <li class="nav-title">Menu</li>
             <li class="nav-item">
                 <a class="nav-link" href="#">
-                    <i class="nav-icon cui-speedometer"></i> Nav item
+                    <i class="nav-icon cui-list"></i> Categories
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="nav-icon cui-speedometer"></i> With badge
-                    <span class="badge badge-primary">NEW</span>
+                <a class="nav-link" href="{{route('user.index')}}">
+                    <i class="nav-icon cui-people"></i> Users
                 </a>
             </li>
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">
-                    <i class="nav-icon cui-puzzle"></i> Nav dropdown
+                    <i class="nav-icon cui-settings"></i> Settings
                 </a>
                 <ul class="nav-dropdown-items">
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="nav-icon cui-puzzle"></i> Nav dropdown item
+                            <i class="nav-icon cui-tags"></i> Roles
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">
-                            <i class="nav-icon cui-puzzle"></i> Nav dropdown item
+                            <i class="nav-icon cui-task"></i> Permissions
                         </a>
                     </li>
                 </ul>
-            </li>
-            <li class="nav-item mt-auto">
-                <a class="nav-link nav-link-success" href="https://coreui.io">
-                    <i class="nav-icon cui-cloud-download"></i> Download CoreUI</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-link-danger" href="https://coreui.io/pro/">
-                    <i class="nav-icon cui-layers"></i> Try CoreUI
-                    <strong>PRO</strong>
-                </a>
             </li>
         </ul>
     </nav>

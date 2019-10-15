@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f43a645b4cb3d85ae04049046b0845a",
+    "content-hash": "c625acc138ea4db0c5979cbc2256f170",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1414,6 +1414,142 @@
                 "uuid"
             ],
             "time": "2018-07-19T23:38:55+00:00"
+        },
+        {
+            "name": "spatie/laravel-html",
+            "version": "2.24.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-html.git",
+                "reference": "577ac734b4a1e8e5ab7a5a382d10b4e57f8020d5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-html/zipball/577ac734b4a1e8e5ab7a5a382d10b4e57f8020d5",
+                "reference": "577ac734b4a1e8e5ab7a5a382d10b4e57f8020d5",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0",
+                "illuminate/support": "~5.5.0|~5.6.0|~5.7.0|~5.8.0|^6.0",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^7.0|^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Html\\HtmlServiceProvider"
+                    ],
+                    "aliases": {
+                        "Html": "Spatie\\Html\\Facades\\Html"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Html\\": "src"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A fluent html builder",
+            "homepage": "https://github.com/spatie/laravel-html",
+            "keywords": [
+                "html",
+                "spatie"
+            ],
+            "time": "2019-09-24T19:35:00+00:00"
+        },
+        {
+            "name": "spatie/laravel-permission",
+            "version": "3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-permission.git",
+                "reference": "5bac2326fe73c7da9a3ae07dcf5fb44224e45f6f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/5bac2326fe73c7da9a3ae07dcf5fb44224e45f6f",
+                "reference": "5bac2326fe73c7da9a3ae07dcf5fb44224e45f6f",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^5.8|^6.0",
+                "illuminate/container": "^5.8|^6.0",
+                "illuminate/contracts": "^5.8|^6.0",
+                "illuminate/database": "^5.8|^6.0",
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^3.8",
+                "phpunit/phpunit": "^8.0",
+                "predis/predis": "^1.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Permission\\PermissionServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Permission\\": "src"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Permission handling for Laravel 5.8 and up",
+            "homepage": "https://github.com/spatie/laravel-permission",
+            "keywords": [
+                "acl",
+                "laravel",
+                "permission",
+                "permissions",
+                "rbac",
+                "roles",
+                "security",
+                "spatie"
+            ],
+            "time": "2019-09-02T14:57:53+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

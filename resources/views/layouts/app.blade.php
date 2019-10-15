@@ -24,6 +24,19 @@
 <div id="app" class="app-body">
     @include('includes.sidebar')
     <main class="main">
+        @yield('breadcrumb')
+        @if (session()->has('errors'))
+            <div class="container-fluid">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @foreach($errors->all() as $message)
+                        <div>{{$message}}</div>
+                    @endforeach
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        @endif
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
