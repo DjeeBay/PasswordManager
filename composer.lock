@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c625acc138ea4db0c5979cbc2256f170",
+    "content-hash": "86aa6aaef0fa35812edf358cdeadd73d",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -3026,6 +3026,57 @@
                 "environment"
             ],
             "time": "2019-09-10T21:37:39+00:00"
+        },
+        {
+            "name": "wildside/userstamps",
+            "version": "0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/WildSideUK/Laravel-Userstamps.git",
+                "reference": "63a9a6481bf2f05cef5790faad1606fa1adba9bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/WildSideUK/Laravel-Userstamps/zipball/63a9a6481bf2f05cef5790faad1606fa1adba9bf",
+                "reference": "63a9a6481bf2f05cef5790faad1606fa1adba9bf",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^5.1|^6.0",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "illuminate/database": "^5.1|^6.0",
+                "orchestra/testbench": "^3.1|^4.0",
+                "phpunit/phpunit": "^5.0|^6.0|^7.0|^8.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wildside\\Userstamps\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "WILDSIDE",
+                    "email": "hello@wildside.uk",
+                    "homepage": "https://wildside.uk"
+                }
+            ],
+            "description": "Eloquent trait to automatically maintain created_by and updated_by (and deleted_by when using SoftDeletes) on your models",
+            "keywords": [
+                "created_by",
+                "deleted_by",
+                "eloquent",
+                "laravel",
+                "updated_by",
+                "userstamps"
+            ],
+            "time": "2019-09-20T07:30:50+00:00"
         }
     ],
     "packages-dev": [

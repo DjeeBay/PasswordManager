@@ -25,12 +25,22 @@
     @include('includes.sidebar')
     <main class="main">
         @yield('breadcrumb')
-        @if (session()->has('errors'))
+        @if (isset($errors) && $errors->all())
             <div class="container-fluid">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     @foreach($errors->all() as $message)
                         <div>{{$message}}</div>
                     @endforeach
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        @endif
+        @if (isset($success))
+            <div class="container-fluid">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <div>{{$success}}</div>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

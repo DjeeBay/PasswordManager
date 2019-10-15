@@ -41,7 +41,41 @@
                         {{html()->email('email', old('email'))->class('form-control')->placeholder('email')->required()}}
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{html()->label('Name (pseudo)', 'name')}}
+                        {{html()->text('name', old('name'))->class('form-control')->placeholder('name')->required()}}
+                    </div>
+                </div>
+
+                @if ((isset($user) && (Auth::user()->id === $user->id || Auth::user()->is_admin)) || !isset($user))
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{html()->label('Password', 'password')}}
+                            {{html()->password('password')->class('form-control')->placeholder('password')->required(!isset($user))}}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{html()->label('Password Confirmation', 'password_confirmation')}}
+                            {{html()->password('password_confirmation')->class('form-control')->placeholder('password confirmation')}}
+                        </div>
+                    </div>
+                @endif
             </div>
+
+            @if (Auth::user()->is_admin)
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div>{{html()->label('Admin')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('is_admin', old('is_admin'))->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="card-footer">

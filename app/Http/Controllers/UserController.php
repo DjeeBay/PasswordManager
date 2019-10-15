@@ -3,11 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\SaveUserRequest;
-use App\User;
+use App\Interfaces\UserRepositoryInterface;
+use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    /** @var UserRepositoryInterface $repository */
+    protected $repository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->repository = $userRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -35,9 +45,20 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SaveUserRequest $request)
     {
-        //
+        if (($request->password || $request->password_confirmation) && $request->password !== $request->password_confirmation) {
+            session()->flashInput($request->input());
+
+            return back()
+                ->withErrors(['Passwords must be identical'])
+                ->withUsers(User::all());
+        }
+        $this->repository->create($request->all());
+
+        return view('user.index')
+            ->withUsers(User::all())
+            ->withSuccess('The use has been created !');
     }
 
     /**
@@ -72,8 +93,16 @@ class UserController extends Controller
      */
     public function update(SaveUserRequest $request, $id)
     {
-        return view('user.form')
-            ->withUser(User::find($id));
+        if (($request->password || $request->password_confirmation) && $request->password !== $request->password_confirmation) {
+            session()->flashInput($request->input());
+
+            return back()
+                ->withErrors(['Passwords must be identical'])
+                ->withUsers(User::all());
+        }
+        $this->repository->update(User::find($id), $request->all());
+
+        return view('user.index')->withUsers(User::all());
     }
 
     /**

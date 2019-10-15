@@ -13,9 +13,11 @@
     <div class="card">
         <div class="card-header bg-cyan">
             Users list
-            <a href="{{route('user.create')}}">
-                <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cui-plus"></i> Create</button>
-            </a>
+            @if (Auth::user()->is_admin || Auth::user()->can('create user'))
+                <a href="{{route('user.create')}}">
+                    <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cui-plus"></i> Create</button>
+                </a>
+            @endif
         </div>
 
         <div class="card-body">

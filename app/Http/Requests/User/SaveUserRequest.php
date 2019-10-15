@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class SaveUserRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class SaveUserRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Auth::user()->is_admin || Auth::user()->can('create user');
     }
 
     /**
@@ -24,7 +25,13 @@ class SaveUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'string|min:100'
+            'email' => 'required|string|unique:users,email,'.$this->user ?? null,
+            'name' => 'required|string|unique:users,name,'.$this->user ?? null,
+            'firstname' => 'string|nullable',
+            'lastname' => 'string|nullable',
+            'is_admin' => 'boolean|nullable',
+            'password' => 'string|min:8|nullable'.(!$this->user ? '|required' : null),
+            'password_confirmation' => 'string|nullable',
         ];
     }
 }
