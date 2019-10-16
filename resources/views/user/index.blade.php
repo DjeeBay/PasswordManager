@@ -37,10 +37,14 @@
                         <td>{{$user->lastname}}</td>
                         <td>{{$user->email}}</td>
                         <td>
-                            <a href="{{route('user.edit', $user)}}">
-                                <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
-                            </a>
-                            <button type="button" class="btn btn-danger rounded"><i class="cui-trash"></i></button>
+                            @if (Auth::user()->is_admin || Auth::user()->can('edit user') || Auth::user()->id === $user->id)
+                                <a href="{{route('user.edit', $user)}}">
+                                    <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
+                                </a>
+                            @endif
+                            @if (Auth::user()->is_admin || Auth::user()->can('delete user'))
+                                <button type="button" class="btn btn-danger rounded"><i class="cui-trash"></i></button>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

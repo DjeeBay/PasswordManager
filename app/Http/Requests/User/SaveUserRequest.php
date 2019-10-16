@@ -14,7 +14,7 @@ class SaveUserRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->is_admin || Auth::user()->can('create user');
+        return Auth::user()->is_admin || Auth::user()->can('create user') || Auth::user()->can('edit user') || intval($this->user) === Auth::user()->id;
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -36,7 +37,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('user.form');
+        if (Auth::user()->is_admin || Auth::user()->can('create user')) {
+            return view('user.form');
+        }
+
+        return redirect()->route('home');
     }
 
     /**
@@ -80,8 +85,12 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        return view('user.form')
-            ->withUser(User::find($id));
+        if (Auth::user()->is_admin || Auth::user()->can('edit user') || Auth::user()->id === intval($id)) {
+            return view('user.form')
+                ->withUser(User::find($id));
+        }
+
+        return redirect()->route('home');
     }
 
     /**
@@ -102,7 +111,7 @@ class UserController extends Controller
         }
         $this->repository->update(User::find($id), $request->all());
 
-        return view('user.index')->withUsers(User::all());
+        return view('user.index')->withUsers(User::all())->withSuccess('User #'.$id.' has been updated.');
     }
 
     /**
