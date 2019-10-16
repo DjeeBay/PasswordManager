@@ -42,6 +42,9 @@ class UserRepository implements UserRepositoryInterface
             'email' => Arr::get($attributes, 'email')
         ]);
 
+        /** @var User $entity */
+        $entity->syncPermissions(Arr::get($attributes, 'permissions'));
+
         return $entity;
     }
 

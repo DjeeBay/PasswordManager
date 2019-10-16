@@ -76,6 +76,41 @@
                     </div>
                 </div>
             @endif
+
+            @if (Auth::user()->is_admin || Auth::user()->can('manage user permissions'))
+                <hr>
+                <div class="row">
+                    <div class="col-12"><h4>User permissions</h4></div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Create')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('create user')->checked(isset($user) && $user->can('create user'))->id('createUser')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Update')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('edit user')->checked(isset($user) && $user->can('edit user'))->id('editUser')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Delete')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('delete user')->checked(isset($user) && $user->can('delete user'))->id('deleteUser')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Manage permissions')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('manage user permissions')->checked(isset($user) && $user->can('manage user permissions'))->id('manageUserPermissions')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="card-footer">

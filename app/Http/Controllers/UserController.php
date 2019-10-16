@@ -96,9 +96,10 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  SaveUserRequest  $request
-     * @param  int  $id
+     * @param SaveUserRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function update(SaveUserRequest $request, $id)
     {
@@ -109,7 +110,17 @@ class UserController extends Controller
                 ->withErrors(['Passwords must be identical'])
                 ->withUsers(User::all());
         }
-        $this->repository->update(User::find($id), $request->all());
+        $attributes = $request->all();
+        /** @var User $user */
+        $user = User::find($id);
+        if (!Auth::user()->is_admin && !Auth::user()->can('manage user permissions')) {
+            $attributes['is_admin'] = $user->is_admin;
+            $attributes['permissions'] = [];
+            foreach ($user->getAllPermissions() as $permission) {
+                array_push($attributes['permissions'], $permission->name);
+            }
+        }
+        $this->repository->update($user, $attributes);
 
         return view('user.index')->withUsers(User::all())->withSuccess('User #'.$id.' has been updated.');
     }
