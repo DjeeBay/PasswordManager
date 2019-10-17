@@ -57,4 +57,5 @@
     </main>
 </div>
 </body>
+<script src="{{asset('js/formValidation.js')}}" defer></script>
 </html>

@@ -17,9 +17,9 @@
         </div>
 
         @if (isset($user))
-            {{html()->modelForm($user, 'PUT', route('user.update', $user->id))->open()}}
+            {{html()->modelForm($user, 'PUT', route('user.update', $user->id))->class('needs-validation')->novalidate()->open()}}
         @else
-            {{html()->form('POST', route('user.store'))->open()}}
+            {{html()->form('POST', route('user.store'))->class('needs-validation')->novalidate()->open()}}
         @endif
         <div class="card-body">
             <div class="row">
@@ -51,14 +51,14 @@
                 @if ((isset($user) && (Auth::user()->id === $user->id || Auth::user()->is_admin)) || !isset($user))
                     <div class="col-md-6">
                         <div class="form-group">
-                            {{html()->label('Password', 'password')}}
+                            {{html()->label('Password (min. 8)', 'password')}}
                             {{html()->password('password')->class('form-control')->placeholder('password')->required(!isset($user))}}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             {{html()->label('Password Confirmation', 'password_confirmation')}}
-                            {{html()->password('password_confirmation')->class('form-control')->placeholder('password confirmation')}}
+                            {{html()->password('password_confirmation')->class('form-control')->placeholder('password confirmation')->required(!isset($user))}}
                         </div>
                     </div>
                 @endif
