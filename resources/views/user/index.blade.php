@@ -42,8 +42,8 @@
                                     <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
                                 </a>
                             @endif
-                            @if (Auth::user()->is_admin || Auth::user()->can('delete user'))
-                                <button type="button" class="btn btn-danger rounded"><i class="cui-trash"></i></button>
+                            @if ((Auth::user()->is_admin || Auth::user()->can('delete user')) && Auth::user()->id !== $user->id)
+                                <delete-button route="{{route('user.destroy', $user)}}"></delete-button>
                             @endif
                         </td>
                     </tr>

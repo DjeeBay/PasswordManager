@@ -133,6 +133,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (Auth::user()->is_admin || Auth::user()->can('delete user') && intval($id) !== Auth::user()->id) {
+            session()->flash('success', 'User has been deleted.');
+            $this->repository->delete(User::find($id));
+
+            return response()->json(['redirect' => route('user.index')]);
+        }
     }
 }

@@ -50,7 +50,8 @@ class UserRepository implements UserRepositoryInterface
 
     public function delete(Model $entity): bool
     {
-        // TODO: Implement delete() method.
+        /** @var User $entity */
+        return $entity->delete();
     }
 
     public function get(int $id): ?Model

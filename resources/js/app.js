@@ -9,6 +9,7 @@ import '@coreui/coreui/dist/css/coreui.min.css';
 import '@coreui/icons/css/free.min.css';
 import '@fortawesome/fontawesome-free/js/all.min'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import VModal from 'vue-js-modal'
 
 window.Vue = require('vue');
 
@@ -20,10 +21,11 @@ window.Vue = require('vue');
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+const files = require.context('./', true, /\.vue$/i)
+files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// Vue.component('DeleteButton', require('./components/common/DeleteButton')).default
+Vue.use(VModal, { dynamic: true, injectModalsContainer: true })
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
