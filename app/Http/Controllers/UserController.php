@@ -63,7 +63,7 @@ class UserController extends Controller
 
         return view('user.index')
             ->withUsers(User::all())
-            ->withSuccess('The use has been created !');
+            ->withSuccess('The user has been created !');
     }
 
     /**

@@ -3,7 +3,7 @@
         <ul class="nav">
             <li class="nav-title">Menu</li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{route('category.index')}}">
                     <i class="nav-icon cui-list"></i> Categories
                 </a>
             </li>

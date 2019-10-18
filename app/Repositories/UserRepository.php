@@ -17,7 +17,6 @@ class UserRepository implements UserRepositoryInterface
         $this->model = new User();
     }
 
-
     public function create(array $attributes = []): Model
     {
         $this->model->name = Arr::get($attributes, 'name');
