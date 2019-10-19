@@ -4,9 +4,12 @@
 namespace App\Repositories;
 
 use App\Interfaces\UserRepositoryInterface;
+use App\Models\Category;
 use App\Models\User;
+use App\Models\UserCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -19,30 +22,41 @@ class UserRepository implements UserRepositoryInterface
 
     public function create(array $attributes = []): Model
     {
-        $this->model->name = Arr::get($attributes, 'name');
-        $this->model->firstname = Arr::get($attributes, 'firstname');
-        $this->model->lastname = Arr::get($attributes, 'lastname');
-        $this->model->password = bcrypt(Arr::get($attributes, 'password'));
-        $this->model->is_admin = Arr::get($attributes, 'is_admin', 0);
-        $this->model->email = Arr::get($attributes, 'email');
-        $this->model->save();
+        /** @var User $entity */
+        $entity = null;
+        DB::transaction(function () use ($attributes, &$entity) {
+            $this->model->name = Arr::get($attributes, 'name');
+            $this->model->firstname = Arr::get($attributes, 'firstname');
+            $this->model->lastname = Arr::get($attributes, 'lastname');
+            $this->model->password = bcrypt(Arr::get($attributes, 'password'));
+            $this->model->is_admin = Arr::get($attributes, 'is_admin', 0);
+            $this->model->email = Arr::get($attributes, 'email');
+            $this->model->save();
+            $entity = $this->model;
 
-        return $this->model;
+            $entity->syncPermissions(Arr::get($attributes, 'permissions'));
+            $this->syncCategories($entity, Arr::get($attributes, 'categories') ?? [], true);
+        });
+
+        return $entity;
     }
 
     public function update(Model $entity, array $attributes = []): Model
     {
-        $entity->update([
-            'name' => Arr::get($attributes, 'name'),
-            'firstname' => Arr::get($attributes, 'firstname'),
-            'lastname' => Arr::get($attributes, 'lastname'),
-            'password' => Arr::get($attributes, 'password') ? bcrypt(Arr::get($attributes, 'password')) : $entity->password,
-            'is_admin' => Arr::get($attributes, 'is_admin', 0),
-            'email' => Arr::get($attributes, 'email')
-        ]);
+        DB::transaction(function () use (&$entity, $attributes) {
+            $entity->update([
+                'name' => Arr::get($attributes, 'name'),
+                'firstname' => Arr::get($attributes, 'firstname'),
+                'lastname' => Arr::get($attributes, 'lastname'),
+                'password' => Arr::get($attributes, 'password') ? bcrypt(Arr::get($attributes, 'password')) : $entity->password,
+                'is_admin' => Arr::get($attributes, 'is_admin', 0),
+                'email' => Arr::get($attributes, 'email')
+            ]);
 
-        /** @var User $entity */
-        $entity->syncPermissions(Arr::get($attributes, 'permissions'));
+            /** @var User $entity */
+            $entity->syncPermissions(Arr::get($attributes, 'permissions'));
+            $this->syncCategories($entity, Arr::get($attributes, 'categories') ?? []);
+        });
 
         return $entity;
     }
@@ -56,5 +70,19 @@ class UserRepository implements UserRepositoryInterface
     public function get(int $id): ?Model
     {
         // TODO: Implement get() method.
+    }
+
+    private function syncCategories(User $user, array $categories, $createOnly = false)
+    {
+        $userCategoryRepository = app(UserCategoriesRepository::class);
+        if (!$createOnly) {
+            UserCategory::where('user_id', '=', $user->id)->delete();
+        }
+        if ($user->is_admin) {
+            $categories = Category::all()->pluck('id')->toArray();
+        }
+        foreach ($categories as $category) {
+            $userCategoryRepository->create(['user_id' => $user->id, 'category_id' => $category]);
+        }
     }
 }

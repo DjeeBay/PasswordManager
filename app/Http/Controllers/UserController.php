@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\SaveUserRequest;
 use App\Interfaces\UserRepositoryInterface;
+use App\Models\Category;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
@@ -38,7 +39,8 @@ class UserController extends Controller
     public function create()
     {
         if (Auth::user()->is_admin || Auth::user()->can('create user')) {
-            return view('user.form');
+            return view('user.form')
+                ->withCategories(Category::all());
         }
 
         return redirect()->route('home');
@@ -56,13 +58,11 @@ class UserController extends Controller
             session()->flashInput($request->input());
 
             return back()
-                ->withErrors(['Passwords must be identical'])
-                ->withUsers(User::all());
+                ->withErrors(['Passwords must be identical']);
         }
         $this->repository->create($request->all());
 
-        return view('user.index')
-            ->withUsers(User::all())
+        return redirect()->route('user.index')
             ->withSuccess('The user has been created !');
     }
 
@@ -74,7 +74,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        return redirect()->route('user.index');
     }
 
     /**
@@ -87,7 +87,8 @@ class UserController extends Controller
     {
         if (Auth::user()->is_admin || Auth::user()->can('edit user') || Auth::user()->id === intval($id)) {
             return view('user.form')
-                ->withUser(User::find($id));
+                ->withUser(User::find($id))
+                ->withCategories(Category::all());
         }
 
         return redirect()->route('home');
@@ -107,8 +108,7 @@ class UserController extends Controller
             session()->flashInput($request->input());
 
             return back()
-                ->withErrors(['Passwords must be identical'])
-                ->withUsers(User::all());
+                ->withErrors(['Passwords must be identical']);
         }
         $attributes = $request->all();
         /** @var User $user */
@@ -120,9 +120,10 @@ class UserController extends Controller
                 array_push($attributes['permissions'], $permission->name);
             }
         }
-        $this->repository->update($user, $attributes);
+        $user = $this->repository->update($user, $attributes);
 
-        return view('user.index')->withUsers(User::all())->withSuccess('User #'.$id.' has been updated.');
+        return redirect()->route('user.index')
+            ->withSuccess('User '.$user->name.' has been updated.');
     }
 
     /**
@@ -134,8 +135,8 @@ class UserController extends Controller
     public function destroy($id)
     {
         if (Auth::user()->is_admin || Auth::user()->can('delete user') && intval($id) !== Auth::user()->id) {
+            $this->repository->delete(User::findOrFail($id));
             session()->flash('success', 'User has been deleted.');
-            $this->repository->delete(User::find($id));
 
             return response()->json(['redirect' => route('user.index')]);
         }

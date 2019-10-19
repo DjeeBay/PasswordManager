@@ -48,6 +48,6 @@ class User extends Authenticatable
 
     public function categories()
     {
-        return $this->hasManyThrough(Category::class, UserCategory::class);
+        return $this->hasManyThrough(Category::class, UserCategory::class, 'user_id', 'id', 'id', 'category_id');
     }
 }

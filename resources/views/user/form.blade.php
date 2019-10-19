@@ -80,7 +80,7 @@
             @if (Auth::user()->is_admin || Auth::user()->can('manage user permissions'))
                 <hr>
                 <div class="row">
-                    <div class="col-12"><h4>User permissions</h4></div>
+                    <div class="col-12"><h4>Users permissions</h4></div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <div>{{html()->label('Create')}}</div>
@@ -109,6 +109,46 @@
                                 html()->checkbox('permissions[]', old('permissions[]'))->value('manage user permissions')->checked(isset($user) && $user->can('manage user permissions'))->id('manageUserPermissions')->class('switch-input').'<span class="switch-slider"></span>')}}
                         </div>
                     </div>
+                </div>
+
+                <hr>
+                <div class="row">
+                    <div class="col-12"><h4>Categories permissions</h4></div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Create')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('create category')->checked(isset($user) && $user->can('create category'))->id('createCategory')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Update')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('edit category')->checked(isset($user) && $user->can('edit category'))->id('editCategory')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Delete')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('delete category')->checked(isset($user) && $user->can('delete category'))->id('deleteCategory')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="row">
+                    <div class="col-12"><h4>Categories</h4></div>
+                    @foreach ($categories as $category)
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <div>{{html()->label($category->name)}}</div>
+                                {{html()->label()->class('switch switch-success')->html(
+                                    html()->checkbox('categories[]', old('categories[]'))->value($category->id)->checked(isset($user) && $user->categories->where('id', $category->id)->first())->id('category'.$category->id)->class('switch-input').'<span class="switch-slider"></span>')}}
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @endif
         </div>

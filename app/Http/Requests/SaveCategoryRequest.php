@@ -14,7 +14,7 @@ class SaveCategoryRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->is_admin || Auth::user()->can('create category') || (Auth::user()->can('edit category') && $this->route('id') && Auth::user()->categories->where('id', $this->route('id'))->first());
+        return Auth::user()->is_admin || Auth::user()->can('create category') || (Auth::user()->can('edit category') && $this->category && Auth::user()->categories->where('id', $this->category)->first());
     }
 
     /**
@@ -25,7 +25,7 @@ class SaveCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|required|unique:categories,name,'.$this->route('id') ?? null
+            'name' => 'string|required|unique:categories,name,'.$this->category ?? null
         ];
     }
 }

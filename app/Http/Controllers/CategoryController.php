@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SaveCategoryRequest;
 use App\Models\Category;
+use App\Models\User;
 use App\Repositories\CategoryRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
@@ -39,7 +39,8 @@ class CategoryController extends Controller
     public function create()
     {
         if (Auth::user()->is_admin || Auth::user()->can('create category')) {
-            return view('category.form');
+            return view('category.form')
+                ->withUsers(User::where('is_admin', '=', 0)->get());
         }
 
         return redirect()->route('home');
@@ -48,15 +49,14 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  SaveCategoryRequest  $request
+     * @param SaveCategoryRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(SaveCategoryRequest $request)
     {
         $this->repository->create($request->all());
 
-        return view('category.index')
-            ->withCategories(Auth::user()->is_admin ? Category::all() : Auth::user()->categories)
+        return redirect()->route('category.index')
             ->withSuccess('The category has been created !');
     }
 
@@ -68,7 +68,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        return redirect()->route('category.index');
     }
 
     /**
@@ -79,19 +79,28 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        if (Auth::user()->is_admin || (Auth::user()->can('edit category') && Auth::user()->categories->where('id', $id)->first())) {
+            return view('category.form')
+                ->withCategory(Category::findOrFail($id))
+                ->withUsers(User::where('is_admin', '=', 0)->get());
+        }
+
+        return redirect()->route('home');
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  SaveCategoryRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(SaveCategoryRequest $request, $id)
     {
-        //
+        $category = $this->repository->update(Category::findOrFail($id), $request->all());
+
+        return redirect()->route('category.index')
+            ->withSuccess('Category '.$category->name.' has been updated.');
     }
 
     /**
@@ -102,6 +111,11 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (Auth::user()->is_admin || (Auth::user()->can('delete category') && Auth::user()->categories->where('id', $id)->first())) {
+            $this->repository->delete(Category::findOrFail($id));
+            session()->flash('success', 'Category has been deleted.');
+
+            return response()->json(['redirect' => route('category.index')]);
+        }
     }
 }
