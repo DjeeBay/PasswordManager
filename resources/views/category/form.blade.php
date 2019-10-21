@@ -38,9 +38,12 @@
             </div>
 
             <hr>
-            <div class="row">
-                <div class="col-12">
+            <div id="usersSelection" class="row">
+                <div class="col-6">
                     <h4>Who can access ?</h4>
+                </div>
+                <div class="col-6 text-right">
+                    <button type="button" id="selectAll" class="btn btn-dark btn-sm">Toggle all</button>
                 </div>
                 @foreach ($users as $user)
                     <div class="col-md-3">
@@ -59,4 +62,20 @@
         </div>
         {{html()->closeModelForm()}}
     </div>
+@endsection
+
+@section('scripts')
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            let button = document.getElementById('selectAll')
+            let checkboxes = document.querySelectorAll('#usersSelection input[type=checkbox]')
+            button.addEventListener('click', function (event) {
+                let isFirstChecked = checkboxes.length && checkboxes[0].checked
+                for (let i = 0; i < checkboxes.length; i++) {
+                    checkboxes[i].checked = !isFirstChecked
+                    isFirstChecked ? checkboxes[i].removeAttribute('checked') : checkboxes[i].setAttribute('checked', 'checked')
+                }
+            }, false)
+        })
+    </script>
 @endsection

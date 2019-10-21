@@ -18,10 +18,12 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/BosketTreeView.css') }}" rel="stylesheet">
 </head>
-<body class="app sidebar-show">
+<body class="app sidebar-md-show">
 @include('includes.header')
 <div id="app" class="app-body">
+    <notifications></notifications>
     @include('includes.sidebar')
     <main class="main">
         @yield('breadcrumb')
@@ -57,5 +59,6 @@
     </main>
 </div>
 </body>
+@yield('scripts')
 <script src="{{asset('js/formValidation.js')}}" defer></script>
 </html>

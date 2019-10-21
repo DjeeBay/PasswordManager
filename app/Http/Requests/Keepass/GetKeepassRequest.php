@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Keepass;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class SaveCategoryRequest extends FormRequest
+class GetKeepassRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class SaveCategoryRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->is_admin || Auth::user()->can('create category') || (Auth::user()->can('edit category') && $this->category && Auth::user()->categories->where('id', $this->category)->first());
+        return Auth::user()->is_admin || Auth::user()->categories->where('id', $this->category_id)->first();
     }
 
     /**
@@ -25,7 +25,7 @@ class SaveCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|required|unique:categories,name,'.$this->category ?? null
+            //
         ];
     }
 }

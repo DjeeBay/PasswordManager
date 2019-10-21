@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SaveCategoryRequest;
+use App\Http\Requests\Category\SaveCategoryRequest;
 use App\Models\Category;
 use App\Models\User;
 use App\Repositories\CategoryRepository;

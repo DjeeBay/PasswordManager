@@ -21,35 +21,37 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-hover table-dark table-striped">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Nb. Users</th>
-                    <th scope="col">Nb. Data</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach ($categories as $category)
+            <div class="table-responsive">
+                <table class="table table-hover table-dark table-striped">
+                    <thead>
                     <tr>
-                        <td>{{$category->name}}</td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            @if (Auth::user()->is_admin || (Auth::user()->can('edit category') && Auth::user()->categories->where('id', $category->id)->first()))
-                                <a href="{{route('category.edit', $category)}}">
-                                    <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
-                                </a>
-                            @endif
-                            @if ((Auth::user()->is_admin || (Auth::user()->can('delete category')) && Auth::user()->categories->where('id', $category->id)->first()))
-                                <delete-button route="{{route('category.destroy', $category)}}"></delete-button>
-                            @endif
-                        </td>
+                        <th scope="col">Name</th>
+                        <th scope="col">Nb. Users</th>
+                        <th scope="col">Nb. Data</th>
+                        <th scope="col">Actions</th>
                     </tr>
-                @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    @foreach ($categories as $category)
+                        <tr>
+                            <td>{{$category->name}}</td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                @if (Auth::user()->is_admin || (Auth::user()->can('edit category') && Auth::user()->categories->where('id', $category->id)->first()))
+                                    <a href="{{route('category.edit', $category)}}">
+                                        <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
+                                    </a>
+                                @endif
+                                @if ((Auth::user()->is_admin || (Auth::user()->can('delete category')) && Auth::user()->categories->where('id', $category->id)->first()))
+                                    <delete-button route="{{route('category.destroy', $category)}}"></delete-button>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 @endsection
