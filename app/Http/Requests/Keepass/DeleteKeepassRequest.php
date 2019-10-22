@@ -24,9 +24,6 @@ class DeleteKeepassRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'keepass' => 'required|array',
-            'keepass.id' => 'required|integer',
-        ];
+        return [];
     }
 }

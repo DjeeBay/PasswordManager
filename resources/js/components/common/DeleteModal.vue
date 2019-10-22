@@ -3,6 +3,7 @@
         <div class="card-header bg-danger">Confirm to delete</div>
         <div class="card-body">
             <h2>Are you sure ?</h2>
+            <div v-if="bodyText">{{bodyText}}</div>
         </div>
         <div class="card-footer">
             <div class="text-right">
@@ -18,14 +19,23 @@
 
 <script>
     import axios from 'axios'
+    import {EventBus} from './../../eventBus'
 
     export default {
         name: 'DeleteModal',
         props: {
+            bodyText: {
+                type: String,
+                required: false
+            },
             route: {
                 type: String,
                 required: true
-            }
+            },
+            xhrData: {
+                type: Object,
+                required: false
+            },
         },
         methods: {
             cancelSubmit() {
@@ -42,8 +52,13 @@
                         this.counter++
                         if (this.counter >= 500) {
                             this.cancelSubmit()
-                            axios.delete(this.route).then(res => {if (res.data.redirect) location.href = res.data.redirect})
-                            this.$emit('close')
+                            axios.delete(this.route, this.xhrData).then(res => {
+                                EventBus.$emit('data-deleted', res, this.xhrData)
+                                if (res.data.redirect) location.href = res.data.redirect
+                            })
+                                .catch(res => this.$notify({title: 'Error', text: res.response.status !== 500 ? res.response.data.message : 'Internal error.', type: 'error'}))
+                                .finally(() => this.$emit('close'))
+
                         }
                     }, 10)
                 }

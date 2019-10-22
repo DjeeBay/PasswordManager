@@ -117,9 +117,9 @@ class KeepassController extends Controller
         return response()->json(['keepass' => $keepass]);
     }
 
-    public function delete(DeleteKeepassRequest $request, $category_id)
+    public function delete(DeleteKeepassRequest $request, $category_id, $id)
     {
-        $deleted = $this->repository->delete(Keepass::findOrFail($request->json('keepass.id')));
+        $deleted = $this->repository->delete(Keepass::findOrFail($id));
 
         return response()->json($deleted);
     }

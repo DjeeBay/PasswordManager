@@ -8,7 +8,7 @@
                 <button v-on:click="openEditModal({is_folder: 0, parent_id: selection.length ? selection[0].id : null})" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-success']" :disabled="!selection.length"><i class="cui-plus"></i> <i class="cui-file"></i></button>
             </div>
             <div>
-                <button type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-danger']" :disabled="!selection.length"><i class="cui-minus"></i> <i class="cui-trash"></i></button>
+                <button v-on:click="openDeleteFolderModal" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-danger']" :disabled="!selection.length"><i class="cui-minus"></i> <i class="cui-trash"></i></button>
             </div>
         </div>
         <div class="row">
@@ -71,6 +71,7 @@
     import {TreeView} from '@bosket/vue'
     import EditKeepassModal from './modal/EditKeepassModal'
     import AddKeepassFolderModal from "./modal/AddKeepassFolderModal";
+    import DeleteModal from "../common/DeleteModal";
 
     export default {
         name: 'KeepassWrapper',
@@ -78,10 +79,6 @@
         props: {
             categoryId: {
                 type: Number,
-                required: true
-            },
-            deleteRoute: {
-                type: String,
                 required: true
             },
             items: {
@@ -218,14 +215,44 @@
                 }
                 this.$modal.show(AddKeepassFolderModal, props, {adaptive: true, height: 'auto'})
             },
+            openDeleteFolderModal() {
+                if (this.selection && this.selection.length) {
+                    this.$modal.show(DeleteModal, {
+                        bodyText: 'It will delete the folder '+this.selection[0].title+' and all its children.',
+                        xhrData: {keepass: this.selection[0]},
+                        route: '/keepass/'+this.categoryId+'/delete/'+this.selection[0].id
+                    }, {adaptive: true})
+                }
+            },
             openEditModal(keepass) {
                 if (keepass && keepass.parent_id) {
                     let props = {
-                        deleteRoute: this.deleteRoute,
+                        deleteRoute: keepass.id ? '/keepass/'+this.categoryId+'/delete/'+keepass.id : '',
                         keepass: keepass,
                         saveRoute: this.saveRoute,
                     }
                     this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto'})
+                }
+            },
+            removeFolder(keepass) {
+                console.log(keepass)
+                if (!keepass.parent_id) {
+                    let index = this.model.findIndex(k => k.id === keepass.id)
+                    if (index !== -1) {
+                        this.model.splice(index, 1)
+                        this.$notify({title: 'Success', text: 'Folder has been deleted !', type: 'success'})
+                        this.selection = []
+                    }
+                } else {
+                    let parent = this.findParent(this.model, keepass.parent_id)
+                    if (parent) {
+                        let index = parent.children.findIndex(k => k.id === keepass.id)
+                        if (index !== -1) {
+                            parent.children.splice(index, 1)
+                            this.$notify({title: 'Success', text: 'Folder has been deleted !', type: 'success'})
+                            this.selection = []
+                        }
+                    }
                 }
             },
             saveFolderTitle() {
@@ -309,10 +336,11 @@
             }
         },
         mounted() {
-            EventBus.$on('keepass-search', this.hideEmptyItems())
+            EventBus.$on('keepass-search', this.hideEmptyItems)
             EventBus.$on('keepass-saved', (keepass, isNew) => this.update(keepass, isNew))
             EventBus.$on('keepass-deleted', keepass => this.delete(keepass))
             EventBus.$on('keepass-folder-created', keepass => this.addFolder(keepass))
+            EventBus.$on('data-deleted', (res, xhrData) => this.removeFolder(xhrData.keepass))
             this.model = JSON.parse(JSON.stringify(this.items))
 
             let btnGroup = document.getElementById('btnGroup')

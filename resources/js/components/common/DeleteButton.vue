@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import DeleteModal from "./DeleteModal";
+    import DeleteModal from './DeleteModal'
 
     export default {
         name: 'DeleteButton',

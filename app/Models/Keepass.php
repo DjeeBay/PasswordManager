@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Wildside\Userstamps\Userstamps;
 
 class Keepass extends Model
 {
+    use SoftDeletes,
+        Userstamps;
+
     protected $fillable = [
         'title',
         'category_id',

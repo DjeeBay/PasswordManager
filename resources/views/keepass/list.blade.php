@@ -21,7 +21,6 @@
                 <div class="col-md-12">
                     <keepass-wrapper
                         :category-id="{{$category->id}}"
-                        delete-route="{{route('keepass.delete', $category->id)}}"
                         :items='@json($items)'
                         save-route="{{route('keepass.save', $category->id)}}"
                     ></keepass-wrapper>
