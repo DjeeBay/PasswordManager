@@ -73,11 +73,27 @@ class KeepassRepository implements KeepassRepositoryInterface
             ->orderBy('title')
             ->get();
 
-        return $this->setStructureRecusively($items, collect());
+        $rootFolders = $items->where('is_folder', 1)
+        ->where ('parent_id', null)
+        ->values();
+
+        return $this->setStructureRecusively($items, $rootFolders, null);
     }
 
-    private function setStructureRecusively(Collection $allItems, $items)
+    private function setStructureRecusively(Collection $allItems, $folders, $parentID)
     {
+        foreach ($folders as $folder) {
+            $children = $allItems->where('parent_id', $folder->id)->sortBy('title', SORT_NATURAL|SORT_FLAG_CASE, false)->values();
+            foreach ($children as $child) {
+                $child->password = $child->password ? decrypt($child->password) : null;
+            }
+            $folder->children = $children;
+            $this->setStructureRecusively($allItems, $folder->children, $folder->id);
+        }
+
+        return $folders;
+
+
         $items = count($items) ? $items : $allItems->where('parent_id', null)->where('is_folder', 1)->values();
         foreach ($items as $item) {
             if ($item->is_folder) {

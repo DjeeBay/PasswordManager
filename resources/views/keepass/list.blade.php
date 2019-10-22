@@ -19,7 +19,12 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <keepass-wrapper delete-route="{{route('keepass.delete', $category->id)}}" :items='@json($items)' save-route="{{route('keepass.save', $category->id)}}"></keepass-wrapper>
+                    <keepass-wrapper
+                        :category-id="{{$category->id}}"
+                        delete-route="{{route('keepass.delete', $category->id)}}"
+                        :items='@json($items)'
+                        save-route="{{route('keepass.save', $category->id)}}"
+                    ></keepass-wrapper>
                 </div>
             </div>
         </div>

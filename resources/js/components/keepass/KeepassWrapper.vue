@@ -2,7 +2,7 @@
     <div>
         <div id="btnGroup" class="mb-2">
             <div>
-                <button type="button" class="btn btn-primary rounded"><i class="cui-plus"></i> <i class="cui-folder"></i></button>
+                <button v-on:click="openAddFolderModal()" type="button" class="btn btn-primary rounded"><i class="cui-plus"></i> <i class="cui-folder"></i></button>
             </div>
             <div>
                 <button v-on:click="openEditModal({is_folder: 0, parent_id: selection.length ? selection[0].id : null})" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-success']" :disabled="!selection.length"><i class="cui-plus"></i> <i class="cui-file"></i></button>
@@ -20,11 +20,13 @@
                     :selection="selection"
                     :onSelect="onSelect"
                     :transition="transition"
+                    :search="search"
+                    :sort="sortTreeView"
                 ></TreeView>
             </div>
             <div class="col-md-8">
-                <div v-if="selection.length" class="form-inline mb-2 w-50">
-                    <input type="text" v-model="selection[0].title" class="form-control form-control-sm" :class="[selection[0].title ? 'is-valid' : 'is-invalid']">
+                <div v-if="selection.length" class="form-inline mb-2">
+                    <input type="text" v-model="selection[0].title" class="w-50 form-control form-control-sm" :class="[selection[0].title ? 'is-valid' : 'is-invalid']">
                     <button v-on:click="saveFolderTitle" type="button" class="btn btn-sm btn-primary ml-1">Edit</button>
                 </div>
                 <div v-if="selectionHasEntries()">
@@ -68,11 +70,16 @@
     import {EventBus} from './../../eventBus'
     import {TreeView} from '@bosket/vue'
     import EditKeepassModal from './modal/EditKeepassModal'
+    import AddKeepassFolderModal from "./modal/AddKeepassFolderModal";
 
     export default {
         name: 'KeepassWrapper',
         components: {TreeView},
         props: {
+            categoryId: {
+                type: Number,
+                required: true
+            },
             deleteRoute: {
                 type: String,
                 required: true
@@ -88,6 +95,14 @@
             },
         },
         methods: {
+            addFolder(keepass) {
+                keepass.children = []
+                if (this.selection && this.selection.length) {
+                    this.selection[0].children.push(keepass)
+                } else {
+                    this.model.push(keepass)
+                }
+            },
             copy(value, type) {
                 if (value && value !== '<!---->') {
                     navigator.permissions.query({name: 'clipboard-write'}).then(res => {
@@ -116,7 +131,71 @@
                     this.selection[0].children.splice(index, 1)
                 }
             },
+            findParent(through, parentID) {
+                for (let i = 0; i < through.length; i++) {
+                    if (through[i].id === parentID) {
+                        return through[i]
+                    } else if (through[i].children && through[i].children.length) {
+                        let parent = this.findParent(through[i].children, parentID)
+                        if (parent) {
+                            return parent
+                        }
+                    }
+                }
+            },
+            getParents() {
+                //TODO it works, but it's ugly...
+                let parents = []
+                if (!this.selection || !this.selection.length) {
+                    return parents
+                }
+                let parentID = this.selection[0].parent_id
+                let allParentsFound = false
+                while(!allParentsFound) {
+                    let parentFound = this.findParent(this.model, parentID)
+                    if (parentFound) {
+                        parents.push(parentFound)
+                        if (!parentFound.parent_id) {
+                            allParentsFound = true
+                        } else {
+                            parentID = parentFound.parent_id
+                        }
+
+                    } else {
+                        allParentsFound = true
+                    }
+                }
+
+                return parents.reverse()
+            },
+            getPath() {
+                let path = '/'
+                if (!this.selection || !this.selection.length) {
+                    return path
+                }
+                if (!this.selection[0].parent_id) {
+                    return path+this.selection[0].title+'/'
+                }
+                let parents = this.getParents()
+                for (let i = 0; i < parents.length; i++) {
+                    path += parents[i].title+'/'
+                }
+
+                return path+this.selection[0].title+'/'
+            },
+            hideEmptyItems() {
+                //TODO find a better way to hide those items
+                setTimeout(() => {
+                    let items = document.getElementsByClassName('item')
+                    for (let i = 0; i < items.length; i++) {
+                        if (!items[i].innerHTML) {
+                            items[i].style.display = 'none'
+                        }
+                    }
+                }, 50)
+            },
             manageFolderIcons() {
+                //TODO bosket can probably manage that
                 setTimeout(() => {
                     let itemsNotFolded = document.querySelectorAll('li.category:not(.folded)>.item a i')
                     let itemsFolded = document.querySelectorAll('li.category.folded>.item a i')
@@ -129,6 +208,15 @@
                         itemsFolded[i].classList.add('cui-folder')
                     }
                 }, 50)
+            },
+            openAddFolderModal() {
+                let props = {
+                    categoryId: this.categoryId,
+                    parentId: this.selection && this.selection.length ? this.selection[0].id : null,
+                    path: this.getPath(),
+                    saveRoute: this.saveRoute
+                }
+                this.$modal.show(AddKeepassFolderModal, props, {adaptive: true, height: 'auto'})
             },
             openEditModal(keepass) {
                 if (keepass && keepass.parent_id) {
@@ -151,6 +239,16 @@
                     } else {
                         this.$notify({title: 'Warning', text: 'Title is required !', type: 'warn'})
                     }
+                }
+            },
+            search(input) {
+                EventBus.$emit('keepass-search')
+                return item => {
+                    return item.title.match(new RegExp(`.*${ input }.*`, 'gi'))
+                        || (item.login && item.login.match(new RegExp(`.*${ input }.*`, 'gi')))
+                        || (item.password && item.password.match(new RegExp(`.*${ input }.*`, 'gi')))
+                        || (item.url && item.url.match(new RegExp(`.*${ input }.*`, 'gi')))
+                        || (item.notes && item.notes.match(new RegExp(`.*${ input }.*`, 'gi')))
                 }
             },
             selectionHasEntries() {
@@ -186,6 +284,16 @@
                     this.selection[0].children = JSON.parse(JSON.stringify(this.sortByProperty(this.selection[0].children, 'title')))
                 }
             },
+            sortTreeView(a, b) {
+                const sameChildrenState = 'children' in a === 'children' in b
+                if (sameChildrenState) {
+                    return a.title.localeCompare(b.title)
+                } else if ('children' in a) {
+                    return -1
+                } else {
+                    return 1
+                }
+            },
             update(keepass, isNew) {
                 if (isNew) {
                     this.selection[0].children.push(keepass)
@@ -201,8 +309,10 @@
             }
         },
         mounted() {
+            EventBus.$on('keepass-search', this.hideEmptyItems())
             EventBus.$on('keepass-saved', (keepass, isNew) => this.update(keepass, isNew))
             EventBus.$on('keepass-deleted', keepass => this.delete(keepass))
+            EventBus.$on('keepass-folder-created', keepass => this.addFolder(keepass))
             this.model = JSON.parse(JSON.stringify(this.items))
 
             let btnGroup = document.getElementById('btnGroup')
@@ -213,6 +323,11 @@
                     btnGroup.classList.remove('sticked')
                 }
             })
+
+            let searchInput = document.getElementsByClassName('search')
+            if (searchInput && searchInput.length) {
+                searchInput[0].classList.add('form-control')
+            }
         },
         data() {
             return {
@@ -230,6 +345,7 @@
                     if (item.is_folder) {
                         return <a><i class="cui-folder text-primary"></i> {item.title}</a>
                     }
+                    return null
                 },
             }
         }
