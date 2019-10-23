@@ -1,14 +1,22 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasPermissions;
+use Spatie\Permission\Traits\HasRoles;
+use Wildside\Userstamps\Userstamps;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasRoles,
+        HasPermissions,
+        Notifiable,
+        SoftDeletes,
+        Userstamps;
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +24,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'firstname', 'lastname', 'is_admin'
     ];
 
     /**
@@ -35,5 +43,11 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean'
     ];
+
+    public function categories()
+    {
+        return $this->hasManyThrough(Category::class, UserCategory::class, 'user_id', 'id', 'id', 'category_id');
+    }
 }

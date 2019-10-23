@@ -1,0 +1,11 @@
+@import url(https://fonts.googleapis.com/css?family=Nunito);.handHover {
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .main .container-fluid {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
