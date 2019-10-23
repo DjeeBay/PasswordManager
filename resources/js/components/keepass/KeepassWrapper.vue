@@ -41,7 +41,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <template v-for="keepass in selection[0].children">
+                            <template v-for="keepass in selection[0].children" v-if="!keepass.is_folder">
                                 <tr>
                                     <th colspan="4" class="text-center">
                                         <span v-on:click="openEditModal(keepass)" class="badge badge-info handHover">{{keepass.title}}</span>
@@ -296,9 +296,9 @@
                     if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop)) {
                         let first = a.title.toUpperCase()
                         let second = b.title.toUpperCase()
-                        if (first < second) {
+                        if (first > second) {
                             comparison = -1
-                        } else if (first > second) {
+                        } else if (first < second) {
                             comparison = 1
                         }
 
@@ -308,7 +308,7 @@
             },
             sortChildrenByTitle() {
                 if (this.selection && this.selection.length && this.selection[0].children && this.selection[0].children.length) {
-                    this.selection[0].children = JSON.parse(JSON.stringify(this.sortByProperty(this.selection[0].children, 'title')))
+                    this.selection[0].children = this.sortByProperty(this.selection[0].children, 'title')
                 }
             },
             sortTreeView(a, b) {
