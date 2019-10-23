@@ -18,7 +18,13 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="text" v-model="keepassComputed.password" class="form-control">
+                        <input :type="showPassword ? 'text' : 'password'" v-model="keepassComputed.password" class="form-control">
+                        <div class="mt-1">
+                            <button v-on:click="showPassword = !showPassword" type="button" class="btn btn-sm btn-secondary"><i :class="[showPassword ? 'cui-lock-unlocked' : 'cui-lock-locked']"></i></button>
+                            <button v-on:click="generatePassword" type="button" class="btn btn-sm btn-dark">Generate ({{passwordLength}})</button>
+                            <button v-on:click="passwordLength++" type="button" class="btn btn-sm btn-dark"><i class="cui-caret-top"></i></button>
+                            <button v-on:click="passwordLength > 5 ? passwordLength-- : null" type="button" class="btn btn-sm btn-dark"><i class="cui-caret-bottom"></i></button>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -76,6 +82,15 @@
             close() {
                 this.$emit('close')
             },
+            generatePassword() {
+                let chars = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>{}[]ABCDEFGHIJKLMNOP1234567890'
+                let pass = ''
+                for (let x = 0; x < this.passwordLength; x++) {
+                    let i = Math.floor(Math.random() * chars.length)
+                    pass += chars.charAt(i)
+                }
+                this.keepassComputed.password = pass
+            },
             save() {
                 if (this.keepassComputed.title) {
                     axios.post(this.saveRoute, {keepass: this.keepassComputed}).then(res => {
@@ -114,7 +129,9 @@
             return {
                 counter: 0,
                 interval: false,
-                keepassComputed: {}
+                keepassComputed: {},
+                passwordLength: 10,
+                showPassword: false
             }
         }
     }
