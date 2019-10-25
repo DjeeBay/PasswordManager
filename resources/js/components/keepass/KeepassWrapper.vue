@@ -262,7 +262,7 @@
                             if (res.data.keepass) {
                                 this.$notify({title: 'Success', text: 'Title has been updated !', type: 'success'})
                             }
-                        })
+                        }).catch(res => this.$notify({title: 'Error', text: res.response.status !== 500 ? res.response.data.message : 'Internal error.', type: 'error'}))
                     } else {
                         this.$notify({title: 'Warning', text: 'Title is required !', type: 'warn'})
                     }
@@ -273,7 +273,6 @@
                 return item => {
                     return item.title.match(new RegExp(`.*${ input }.*`, 'gi'))
                         || (item.login && item.login.match(new RegExp(`.*${ input }.*`, 'gi')))
-                        || (item.password && item.password.match(new RegExp(`.*${ input }.*`, 'gi')))
                         || (item.url && item.url.match(new RegExp(`.*${ input }.*`, 'gi')))
                         || (item.notes && item.notes.match(new RegExp(`.*${ input }.*`, 'gi')))
                 }
@@ -400,6 +399,11 @@
         right: 30px;
         top: 60px;
         z-index: 10;
+    }
+
+    .TreeView {
+        max-height: 100vh;
+        overflow-y: auto;
     }
 
     th, td {

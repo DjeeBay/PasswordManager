@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Keepass\DeleteKeepassRequest;
 use App\Http\Requests\Keepass\GetKeepassRequest;
+use App\Http\Requests\Keepass\ImportKeepassController;
 use App\Http\Requests\Keepass\SaveKeepassRequest;
 use App\Interfaces\KeepassRepositoryInterface;
 use App\Models\Category;
 use App\Models\Keepass;
 use App\Repositories\KeepassRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KeepassController extends Controller
 {
@@ -122,5 +124,24 @@ class KeepassController extends Controller
         $deleted = $this->repository->delete(Keepass::findOrFail($id));
 
         return response()->json($deleted);
+    }
+
+    public function getImport()
+    {
+        if (Auth::user()->is_admin || Auth::user()->can('import keepass')) {
+            return view('keepass.import');
+        }
+
+        return redirect()->route('home');
+    }
+
+    public function import(ImportKeepassController $request)
+    {
+        $xml = simplexml_load_file($request->file('xml'));
+        if (!$xml || !$this->repository->processXml($xml, $request->category_name)) {
+            return back()->withErrors(['Invalid xml.']);
+        }
+
+        return redirect()->route('home')->withSuccess('XML successfully imported !');
     }
 }

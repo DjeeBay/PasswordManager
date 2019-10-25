@@ -23,7 +23,7 @@ class CreateKeepassesTable extends Migration
                 $table->boolean('is_folder');
                 $table->unsignedBigInteger('parent_id')->nullable();
                 $table->string('login')->nullable();
-                $table->string('password')->nullable();
+                $table->text('password')->nullable();
                 $table->text('url')->nullable();
                 $table->text('notes')->nullable();
                 $table->timestamps();

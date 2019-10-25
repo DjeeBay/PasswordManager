@@ -14,7 +14,8 @@
         "laravel/tinker": "^1.0",
         "spatie/laravel-html": "^2.24",
         "spatie/laravel-permission": "^3.0",
-        "wildside/userstamps": "^0.6.0"
+        "wildside/userstamps": "^0.6.0",
+        "ext-simplexml": "*"
     },
     "require-dev": {
         "facade/ignition": "^1.4",

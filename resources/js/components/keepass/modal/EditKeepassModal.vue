@@ -98,7 +98,9 @@
                             this.$notify({title: 'Success', text: 'Item has been saved !', type: 'success'})
                             EventBus.$emit('keepass-saved', res.data.keepass, !this.keepass.id)
                         }
-                    }).finally(() => this.close())
+                    })
+                        .catch(res => this.$notify({title: 'Error', text: res.response.status !== 500 ? res.response.data.message : 'Internal error.', type: 'error'}))
+                        .finally(() => this.close())
                 } else {
                     this.$notify({title: 'Warning', text: 'Please enter a title.', type: 'warn'})
                 }
@@ -124,6 +126,10 @@
         },
         mounted() {
             this.keepassComputed = JSON.parse(JSON.stringify(this.keepass))
+            if (!this.keepass.id) {
+                this.keepassComputed.password = null
+                this.keepassComputed = JSON.parse(JSON.stringify(this.keepassComputed))
+            }
         },
         data() {
             return {

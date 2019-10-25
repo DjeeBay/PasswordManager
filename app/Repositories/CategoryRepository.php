@@ -26,6 +26,7 @@ class CategoryRepository implements CategoryRepositoryInterface
     {
         $entity = null;
         DB::transaction(function () use ($attributes, &$entity) {
+            $this->model = $this->model->newInstance();
             $this->model->name = Arr::get($attributes, 'name');
             $this->model->description = Arr::get($attributes, 'description');
             $this->model->save();
