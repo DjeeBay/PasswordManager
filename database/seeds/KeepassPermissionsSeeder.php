@@ -18,6 +18,7 @@ class KeepassPermissionsSeeder extends Seeder
             ->where('name', '=', 'create keepass')
             ->orWhere('name', '=', 'edit keepass')
             ->orWhere('name', '=', 'delete keepass')
+            ->orWhere('name', '=', 'import keepass')
             ->get();
 
         if (!count($alreadyExists)) {
@@ -33,6 +34,10 @@ class KeepassPermissionsSeeder extends Seeder
                     ],
                     [
                         'name' => 'delete keepass',
+                        'guard_name' => 'web'
+                    ],
+                    [
+                        'name' => 'import keepass',
                         'guard_name' => 'web'
                     ]
                 ]);

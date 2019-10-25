@@ -113,6 +113,39 @@
 
                 <hr>
                 <div class="row">
+                    <div class="col-12"><h4>Keepass permissions</h4></div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Create')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('create keepass')->checked(isset($user) && $user->can('create keepass'))->id('createKeepass')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Update')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('edit keepass')->checked(isset($user) && $user->can('edit keepass'))->id('editKeepass')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Delete')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('delete keepass')->checked(isset($user) && $user->can('delete keepass'))->id('deleteKeepass')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Import')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('import keepass')->checked(isset($user) && $user->can('import keepass'))->id('importKeepass')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="row">
                     <div class="col-12"><h4>Categories permissions</h4></div>
                     <div class="col-md-3">
                         <div class="form-group">

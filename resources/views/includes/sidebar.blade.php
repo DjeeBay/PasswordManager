@@ -25,6 +25,13 @@
                             <i class="nav-icon cui-people"></i> Users
                         </a>
                     </li>
+                    @if (Auth::user()->is_admin || Auth::user()->can('import keepass'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('keepass.get_import')}}">
+                                <i class="nav-icon cui-cloud-upload"></i> Import
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         </ul>

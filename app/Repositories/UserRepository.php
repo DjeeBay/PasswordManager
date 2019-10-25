@@ -25,6 +25,7 @@ class UserRepository implements UserRepositoryInterface
         /** @var User $entity */
         $entity = null;
         DB::transaction(function () use ($attributes, &$entity) {
+            $this->model = $this->model->newInstance();
             $this->model->name = Arr::get($attributes, 'name');
             $this->model->firstname = Arr::get($attributes, 'firstname');
             $this->model->lastname = Arr::get($attributes, 'lastname');

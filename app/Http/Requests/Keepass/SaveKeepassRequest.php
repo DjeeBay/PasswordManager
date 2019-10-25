@@ -14,7 +14,9 @@ class SaveKeepassRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->is_admin || (Auth::user()->can('edit keepass') && Auth::user()->categories->where('id', $this->category_id)->first());
+        $edit = $this->keepass && array_key_exists('id', $this->keepass) && $this->keepass['id'];
+
+        return Auth::user()->is_admin || (Auth::user()->can($edit ? 'edit keepass' : 'create keepass') && Auth::user()->categories->where('id', $this->category_id)->first());
     }
 
     /**

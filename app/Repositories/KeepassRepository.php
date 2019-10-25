@@ -3,8 +3,8 @@
 
 namespace App\Repositories;
 
-
 use App\Interfaces\KeepassRepositoryInterface;
+use App\Models\Category;
 use App\Models\Keepass;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +24,7 @@ class KeepassRepository implements KeepassRepositoryInterface
     {
         $entity = null;
         DB::transaction(function () use ($attributes, &$entity) {
+            $this->model = $this->model->newInstance();
             $this->model->title = Arr::get($attributes, 'title');
             $this->model->category_id = Arr::get($attributes, 'category_id');
             $this->model->is_folder = Arr::get($attributes, 'is_folder');
@@ -75,37 +76,117 @@ class KeepassRepository implements KeepassRepositoryInterface
 
         $rootFolders = $items->where('is_folder', 1)
         ->where ('parent_id', null)
-        ->values();
+        ->values()->toArray();
 
-        return $this->setStructureRecusively($items, $rootFolders, null);
+        return $this->setStructureRecusively($items->toArray(), $rootFolders);
     }
 
-    private function setStructureRecusively(Collection $allItems, $folders, $parentID)
+    private function setStructureRecusively(array $allItems, array &$folders)
     {
-        foreach ($folders as $folder) {
-            $children = $allItems->where('parent_id', $folder->id)->sortBy('title', SORT_NATURAL|SORT_FLAG_CASE, false)->values();
-            foreach ($children as $child) {
-                $child->password = $child->password ? decrypt($child->password) : null;
+        foreach ($folders as &$folder) {
+            $folder = (array) $folder;
+            $children = [];
+            foreach ($allItems as $item) {
+                if ($item['parent_id'] === $folder['id']) {
+                    array_push($children, $item);
+                }
             }
-            $folder->children = $children;
-            $this->setStructureRecusively($allItems, $folder->children, $folder->id);
+            foreach ($children as $child) {
+                $child['password'] = $child['password'] ? decrypt($child['password']) : null;
+            }
+            $folder['children'] = $children;
+            $this->setStructureRecusively($allItems, $folder['children']);
         }
 
         return $folders;
+    }
 
+    public function processXml(\SimpleXMLElement $xml, $categoryName) : bool
+    {
+        $imported = false;
+        DB::transaction(function() use ($xml, $categoryName, &$imported) {
+            $categoryRepository = app(CategoryRepository::class);
+            $category = $categoryRepository->create(['name' => $categoryName]);
 
-        $items = count($items) ? $items : $allItems->where('parent_id', null)->where('is_folder', 1)->values();
-        foreach ($items as $item) {
-            if ($item->is_folder) {
-                $children = $allItems->where('parent_id', $item->id)->sortBy('title', SORT_NATURAL|SORT_FLAG_CASE, false)->values();
-                foreach ($children as $child) {
-                    $child->password = $child->password ? decrypt($child->password) : null;
+            $root = $xml->xpath('Root');
+            if ($root && count($root)) {
+                $mainGroup = $root[0]->xpath('Group');
+                if ($mainGroup && count($mainGroup)) {
+                    $groups = $mainGroup[0]->xpath('Group');
+                    if ($groups) {
+                        $this->createKeepassesRecursively(app(KeepassRepository::class), $category, $groups);
+                    }
                 }
-                $item->children = $children;
-                $this->setStructureRecusively($allItems, $children);
+            }
+
+            $imported = true;
+        });
+
+        return $imported;
+    }
+
+    private function createKeepassesRecursively(KeepassRepositoryInterface $keepassRepository, Category $category, array $groups, $parentID = null)
+    {
+        foreach ($groups as $group) {
+            $folder = $keepassRepository->create([
+                'title' => (string) $group->Name,
+                'category_id' => $category->id,
+                'is_folder' => 1,
+                'parent_id' => $parentID
+            ]);
+            $entries = $group->xpath('Entry');
+            if ($entries && is_array($entries)) {
+                foreach ($entries as $entry) {
+                    $params = [
+                        'title' => null,
+                        'category_id' => $category->id,
+                        'is_folder' => 0,
+                        'parent_id' => $folder->id,
+                        'login' => null,
+                        'password' => null,
+                        'url' => null,
+                        'notes' => null,
+                    ];
+                    $columns = $entry->xpath('String');
+                    if ($columns && is_array($columns)) {
+                        /** @var \SimpleXMLElement $column */
+                        foreach ($columns as $column) {
+                            $keyArray = $column->xpath('Key');
+                            $valueArray = $column->xpath('Value');
+                            if ($keyArray && is_array($keyArray) && count($keyArray) && $valueArray && is_array($valueArray) && count($valueArray)) {
+                                $key = (string) $keyArray[0];
+                                switch ($key) {
+                                    case 'Notes':
+                                        $valueArray = $column->xpath('Value');
+                                        $params['notes'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : null;
+                                        break;
+                                    case 'Password':
+                                        $valueArray = $column->xpath('Value');
+                                        $params['password'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : null;
+                                        break;
+                                    case 'Title':
+                                        $valueArray = $column->xpath('Value');
+                                        $params['title'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : '';
+                                        break;
+                                    case 'URL':
+                                        $valueArray = $column->xpath('Value');
+                                        $params['url'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : null;
+                                        break;
+                                    case 'UserName':
+                                        $valueArray = $column->xpath('Value');
+                                        $params['login'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : null;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    $this->create($params);
+                }
+            }
+            $children = $group->xpath('Group');
+            if ($children && is_array($children)) {
+                $this->createKeepassesRecursively($keepassRepository, $category, $children, $folder->id);
             }
         }
-
-        return $items;
     }
 }

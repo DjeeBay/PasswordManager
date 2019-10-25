@@ -21,6 +21,7 @@ class UserCategoriesRepository implements UserCategoriesRepositoryInterface
 
     public function create(array $attributes = []): Model
     {
+        $this->model = $this->model->newInstance();
         $id = $this->model->insertGetId([
             'user_id' => Arr::get($attributes, 'user_id'),
             'category_id' => Arr::get($attributes, 'category_id')
