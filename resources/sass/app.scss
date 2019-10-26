@@ -6,7 +6,17 @@
 
 // Bootstrap
 //@import '~bootstrap/scss/bootstrap';
+.badge-blue {
+    background-color: $blue;
+    color: white;
+}
+
 .handHover {cursor: pointer;}
+
+.text-blue {color: $blue !important;}
+.text-purple {color: $purple !important;}
+.text-green {color: $green !important;}
+.text-red {color: $red !important;}
 
 @media (max-width: 768px) {
     .main .container-fluid {
