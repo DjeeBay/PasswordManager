@@ -12,7 +12,7 @@
 @section('content')
     <div class="card">
         <div class="card-header bg-cyan">
-            Users list
+            Categories list
             @if (Auth::user()->is_admin || Auth::user()->can('create category'))
                 <a href="{{route('category.create')}}">
                     <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cui-plus"></i> Create</button>
@@ -27,7 +27,7 @@
                     <tr>
                         <th scope="col">Name</th>
                         <th scope="col">Nb. Users</th>
-                        <th scope="col">Nb. Data</th>
+                        <th scope="col">Nb. Entries</th>
                         <th scope="col">Actions</th>
                     </tr>
                     </thead>
@@ -35,8 +35,8 @@
                     @foreach ($categories as $category)
                         <tr>
                             <td>{{$category->name}}</td>
-                            <td></td>
-                            <td></td>
+                            <td>{{\App\Models\UserCategory::where('category_id', '=', $category->id)->count()}}</td>
+                            <td>{{\App\Models\Keepass::where('category_id', '=', $category->id)->count()}}</td>
                             <td>
                                 @if (Auth::user()->is_admin || (Auth::user()->can('edit category') && Auth::user()->categories->where('id', $category->id)->first()))
                                     <a href="{{route('category.edit', $category)}}">

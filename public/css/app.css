@@ -1,5 +1,26 @@
-@import url(https://fonts.googleapis.com/css?family=Nunito);.handHover {
+@import url(https://fonts.googleapis.com/css?family=Nunito);.badge-blue {
+  background-color: #3490dc;
+  color: white;
+}
+
+.handHover {
   cursor: pointer;
+}
+
+.text-blue {
+  color: #3490dc !important;
+}
+
+.text-purple {
+  color: #9561e2 !important;
+}
+
+.text-green {
+  color: #38c172 !important;
+}
+
+.text-red {
+  color: #e3342f !important;
 }
 
 @media (max-width: 768px) {

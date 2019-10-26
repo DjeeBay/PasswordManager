@@ -2,13 +2,32 @@
     <nav class="sidebar-nav">
         <ul class="nav">
             <li class="nav-title">Menu</li>
-            @php $categories = Auth::user()->is_admin ? App\Models\Category::all()->sortBy('name') : Auth::user()->categories->sortBy('name'); @endphp
+            @php
+                $categories = Auth::user()->is_admin ? App\Models\Category::all()->sortBy('name') : Auth::user()->categories->sortBy('name');
+                $colors = [
+                    'text-blue',
+                    'text-warning',
+                    'text-purple',
+                    'text-green',
+                    'text-red',
+                ];
+                $colorIndex = 0;
+            @endphp
             @foreach($categories as $category)
+                @php
+                    if (($colorIndex + 1) > count($colors)) {
+                        $colorIndex = 0;
+                    }
+                    $color = $colors[$colorIndex];
+                @endphp
                 <li class="nav-item">
                     <a class="nav-link" href="{{route('keepass.get', $category->id)}}">
-                        <i class="nav-icon cui-folder"></i> {{$category->name}}
+                        <i class="nav-icon cui-folder {{$colors[$colorIndex]}}"></i> {{$category->name}}
                     </a>
                 </li>
+                @php
+                    $colorIndex++;
+                @endphp
             @endforeach
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">

@@ -22,6 +22,7 @@
                     :transition="transition"
                     :search="search"
                     :sort="sortTreeView"
+                    :labels="{'search.placeholder': 'Search (min. 3 char.)'}"
                 ></TreeView>
             </div>
             <div class="col-md-8">
@@ -44,7 +45,7 @@
                             <template v-for="keepass in selection[0].children" v-if="!keepass.is_folder">
                                 <tr>
                                     <th colspan="4" class="text-center">
-                                        <span v-on:click="openEditModal(keepass)" class="badge badge-info handHover">{{keepass.title}}</span>
+                                        <span v-on:click="openEditModal(keepass)" class="badge badge-blue handHover">{{keepass.title}}</span>
                                     </th>
                                 </tr>
                                 <tr>
@@ -269,6 +270,7 @@
                 }
             },
             search(input) {
+                if (input.length < 3) return item => false
                 EventBus.$emit('keepass-search')
                 return item => {
                     return item.title.match(new RegExp(`.*${ input }.*`, 'gi'))

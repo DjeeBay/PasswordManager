@@ -25,7 +25,7 @@ class KeepassRepository implements KeepassRepositoryInterface
         $entity = null;
         DB::transaction(function () use ($attributes, &$entity) {
             $this->model = $this->model->newInstance();
-            $this->model->title = Arr::get($attributes, 'title');
+            $this->model->title = Arr::get($attributes, 'title', 'no_title');
             $this->model->category_id = Arr::get($attributes, 'category_id');
             $this->model->is_folder = Arr::get($attributes, 'is_folder');
             $this->model->parent_id = Arr::get($attributes, 'parent_id');
@@ -91,7 +91,7 @@ class KeepassRepository implements KeepassRepositoryInterface
                     array_push($children, $item);
                 }
             }
-            foreach ($children as $child) {
+            foreach ($children as &$child) {
                 $child['password'] = $child['password'] ? decrypt($child['password']) : null;
             }
             $folder['children'] = $children;
@@ -166,7 +166,7 @@ class KeepassRepository implements KeepassRepositoryInterface
                                         break;
                                     case 'Title':
                                         $valueArray = $column->xpath('Value');
-                                        $params['title'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : '';
+                                        $params['title'] = strlen((string) $valueArray[0]) ? (string) $valueArray[0] : 'no_title';
                                         break;
                                     case 'URL':
                                         $valueArray = $column->xpath('Value');
