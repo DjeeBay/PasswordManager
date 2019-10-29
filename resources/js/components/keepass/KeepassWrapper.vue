@@ -121,7 +121,7 @@
                             } else {
                                 this.copyFromInput(value, type)
                             }
-                        });
+                        }).catch(error => this.copyFromInput(value, type))
                     }
                 }
             },
