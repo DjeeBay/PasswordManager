@@ -108,7 +108,7 @@
             },
             copy(value, type) {
                 if (value && value !== '<!---->') {
-                    if (navigator.userAgent.match(/ipad|iphone/i)) {
+                    if (navigator.userAgent.match(/ipad|iphone/i) || navigator.userAgent.indexOf('Safari') !== -1 && navigator.userAgent.indexOf('Chrome') === -1) {
                         this.copyFromInput(value, type)
                     } else {
                         navigator.permissions.query({name: 'clipboard-write'}).then(res => {
@@ -248,7 +248,6 @@
                 }
             },
             removeFolder(keepass) {
-                console.log(keepass)
                 if (!keepass.parent_id) {
                     let index = this.model.findIndex(k => k.id === keepass.id)
                     if (index !== -1) {

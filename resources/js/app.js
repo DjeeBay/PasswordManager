@@ -5,10 +5,7 @@
  */
 require('./bootstrap');
 import '@coreui/coreui';
-import '@coreui/coreui/dist/css/coreui.min.css';
-import '@coreui/icons/css/free.min.css';
 import '@fortawesome/fontawesome-free/js/all.min'
-import '@fortawesome/fontawesome-free/css/all.min.css'
 import VModal from 'vue-js-modal'
 import Notifications from 'vue-notification'
 
