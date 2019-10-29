@@ -1,6 +1,9 @@
 <template>
     <div>
         <div id="btnGroup" class="mb-2">
+            <div class="floatLeftBtn">
+                <button v-on:click="showTree = !showTree" type="button" class="btn btn-dark rounded"><i :class="[showTree ? 'cui-minus' : 'cui-plus']"></i></button>
+            </div>
             <div>
                 <button v-on:click="openAddFolderModal()" type="button" class="btn btn-primary rounded"><i class="cui-plus"></i> <i class="cui-folder"></i></button>
             </div>
@@ -12,7 +15,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4">
+            <div v-if="showTree" class="col-md-3">
                 <TreeView
                     :model="model"
                     :display="display"
@@ -25,16 +28,17 @@
                     :labels="{'search.placeholder': 'Search (min. 3 char.)'}"
                 ></TreeView>
             </div>
-            <div class="col-md-8">
+            <div class="colTreeView" :class="[showTree ? 'col-md-9' : 'col-md-12']">
                 <div v-if="selection.length" class="form-inline mb-2">
                     <input type="text" v-model="selection[0].title" class="w-50 form-control form-control-sm" :class="[selection[0].title ? 'is-valid' : 'is-invalid']">
-                    <button v-on:click="saveFolderTitle" type="button" class="btn btn-sm btn-primary ml-1">Edit</button>
+                    <button v-on:click="saveFolderTitle" type="button" class="btn btn-sm btn-primary ml-1">Save</button>
                 </div>
                 <div v-if="selectionHasEntries()">
                     <div class="table-responsive table-sm">
                         <table class="table table-dark table-striped">
                             <thead>
                             <tr>
+                                <th>Title</th>
                                 <th>Login</th>
                                 <th>Password</th>
                                 <th>URL</th>
@@ -44,14 +48,15 @@
                             <tbody>
                             <template v-for="keepass in selection[0].children" v-if="!keepass.is_folder">
                                 <tr>
-                                    <th colspan="4" class="text-center">
-                                        <span v-on:click="openEditModal(keepass)" class="badge badge-blue handHover">{{keepass.title}}</span>
-                                    </th>
-                                </tr>
-                                <tr>
+                                    <td>
+                                        <button type="button" v-on:click="openEditModal(keepass)" class="btn btn-sm btn-blue">{{keepass.title}}</button>
+                                    </td>
                                     <td v-on:click="copy(keepass.login, 'Login')" class="handHover">{{keepass.login}}</td>
                                     <td v-on:click="copy(keepass.password, 'Password')" class="handHover"><i v-if="keepass.password">(length {{keepass.password.length}})</i></td>
-                                    <td><a :href="keepass.url" target="_blank">{{keepass.url}}</a></td>
+                                    <td>
+                                        <a :href="keepass.url" target="_blank">{{keepass.url && keepass.url.length > 25 ? keepass.url.substr(0, 24)+'&hellip;' : keepass.url}}</a>
+                                        <span v-if="keepass.url" v-on:click="copy(keepass.url, 'URL')" class="handHover"><i class="cui-copy text-warning"></i></span>
+                                    </td>
                                     <td><div class="notes">{{keepass.notes}}</div></td>
                                 </tr>
                             </template>
@@ -103,25 +108,32 @@
             },
             copy(value, type) {
                 if (value && value !== '<!---->') {
-                    navigator.permissions.query({name: 'clipboard-write'}).then(res => {
-                        if (res.state === 'granted' || res.state === 'prompt') {
-                            navigator.clipboard.writeText(value).then(() => {
-                                this.$notify({text: type+' copied !'})
-                            }, () => {
-                                this.$notify({text: type+' not copied !', type: 'error'})
-                            });
-                        } else {
-                            let fakeInput = document.createElement('textarea')
-                            document.body.appendChild(fakeInput)
-                            fakeInput.value = value
-                            fakeInput.select()
-                            fakeInput.setSelectionRange(0, 99999)
-                            document.execCommand('copy')
-                            document.body.removeChild(fakeInput)
-                            this.$notify({text: type+' copied !'})
-                        }
-                    });
+                    if (navigator.userAgent.match(/ipad|iphone/i)) {
+                        this.copyFromInput(value, type)
+                    } else {
+                        navigator.permissions.query({name: 'clipboard-write'}).then(res => {
+                            if (res.state === 'granted' || res.state === 'prompt') {
+                                navigator.clipboard.writeText(value).then(() => {
+                                    this.$notify({text: type+' copied !'})
+                                }, () => {
+                                    this.$notify({text: type+' not copied !', type: 'error'})
+                                });
+                            } else {
+                                this.copyFromInput(value, type)
+                            }
+                        });
+                    }
                 }
+            },
+            copyFromInput(value, type) {
+                let fakeInput = document.createElement('textarea')
+                document.body.appendChild(fakeInput)
+                fakeInput.value = value
+                fakeInput.select()
+                fakeInput.setSelectionRange(0, 99999)
+                document.execCommand('copy')
+                document.body.removeChild(fakeInput)
+                this.$notify({text: type+' copied !'})
             },
             delete(keepass) {
                 let index = this.selection[0].children.findIndex(k => k.id === keepass.id)
@@ -366,6 +378,7 @@
                     this.selection = newSelection
                     this.manageFolderIcons()
                 },
+                showTree: true,
                 transition: {
                     attrs: { appear: true },
                     props: { name: 'TreeViewTransition' }
@@ -389,6 +402,8 @@
     #btnGroup div {
         display: inline-block;
     }
+
+    .floatLeftBtn {float: left !important;}
 
     .notes {
         max-height: 120px;
@@ -420,6 +435,9 @@
     }
 
     @media (max-width: 768px) {
+        .colTreeView {
+            padding: 0 !important;
+        }
         .TreeView {
             margin-bottom: 15px;
             max-height: 400px;

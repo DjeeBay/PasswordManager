@@ -36,14 +36,14 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label>Notes</label>
-                        <textarea v-model="keepassComputed.notes" class="form-control"></textarea>
+                        <textarea v-model="keepassComputed.notes" class="form-control" rows="5"></textarea>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card-footer" :class="[keepass.id ? '' : 'text-right']">
             <div>
-                <button v-if="keepass.id" v-on:mousedown="submit" v-on:mouseup="cancelSubmit" v-on:mouseleave="cancelSubmit" type="button" class="btn btn-danger">Delete</button>
+                <button v-if="keepass.id" @mousedown="submit" @mouseup="cancelSubmit" @mouseleave="cancelSubmit" @touchstart="submit" @touchend="cancelSubmit" @touchcancel="cancelSubmit" type="button" class="btn btn-danger">Delete</button>
                 <button v-on:click="save()" type="button" class="btn btn-primary rounded ml-2" :class="[keepass.id ? 'float-right' : '']">Save</button>
                 <button v-on:click="close()" type="button" class="btn btn-secondary rounded" :class="[keepass.id ? 'float-right' : '']">Cancel</button>
             </div>

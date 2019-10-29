@@ -3,6 +3,11 @@
   color: white;
 }
 
+.btn-blue {
+  background-color: #3490dc !important;
+  color: white !important;
+}
+
 .handHover {
   cursor: pointer;
 }
@@ -25,8 +30,8 @@
 
 @media (max-width: 768px) {
   .main .container-fluid {
-    padding-left: 15px !important;
-    padding-right: 15px !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
   }
 }
 

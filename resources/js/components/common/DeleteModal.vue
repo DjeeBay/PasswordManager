@@ -7,7 +7,7 @@
         </div>
         <div class="card-footer">
             <div class="text-right">
-                <button v-on:mousedown="submit" v-on:mouseup="cancelSubmit" v-on:mouseleave="cancelSubmit" type="button" class="btn btn-danger">Confirm</button>
+                <button @mousedown="submit" @mouseup="cancelSubmit" @mouseleave="cancelSubmit" @touchstart="submit" @touchend="cancelSubmit" @touchcancel="cancelSubmit" type="button" class="btn btn-danger">Confirm</button>
                 <button v-on:click="close()" type="button" class="btn btn-secondary rounded">Cancel</button>
             </div>
             <div class="progress bg-dark mt-2">
@@ -48,7 +48,7 @@
             },
             submit(e) {
                 if (!this.interval) {
-                    this.interval = setInterval(() => {
+                    this.interval = setInterval(() => {console.log('o')
                         this.counter++
                         if (this.counter >= 500) {
                             this.cancelSubmit()
