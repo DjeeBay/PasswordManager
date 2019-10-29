@@ -53,7 +53,10 @@
                                     </td>
                                     <td v-on:click="copy(keepass.login, 'Login')" class="handHover">{{keepass.login}}</td>
                                     <td v-on:click="copy(keepass.password, 'Password')" class="handHover"><i v-if="keepass.password">(length {{keepass.password.length}})</i></td>
-                                    <td><a :href="keepass.url" target="_blank">{{keepass.url}}</a></td>
+                                    <td>
+                                        <a :href="keepass.url" target="_blank">{{keepass.url && keepass.url.length > 25 ? keepass.url.substr(0, 24)+'&hellip;' : keepass.url}}</a>
+                                        <span v-if="keepass.url" v-on:click="copy(keepass.url, 'URL')" class="handHover"><i class="cui-copy text-warning"></i></span>
+                                    </td>
                                     <td><div class="notes">{{keepass.notes}}</div></td>
                                 </tr>
                             </template>
@@ -106,7 +109,7 @@
             copy(value, type) {
                 if (value && value !== '<!---->') {
                     if (navigator.userAgent.match(/ipad|iphone/i)) {
-                        this.copyFromInput()
+                        this.copyFromInput(value, type)
                     } else {
                         navigator.permissions.query({name: 'clipboard-write'}).then(res => {
                             if (res.state === 'granted' || res.state === 'prompt') {
@@ -116,13 +119,13 @@
                                     this.$notify({text: type+' not copied !', type: 'error'})
                                 });
                             } else {
-                                this.copyFromInput()
+                                this.copyFromInput(value, type)
                             }
                         });
                     }
                 }
             },
-            copyFromInput() {
+            copyFromInput(value, type) {
                 let fakeInput = document.createElement('textarea')
                 document.body.appendChild(fakeInput)
                 fakeInput.value = value
