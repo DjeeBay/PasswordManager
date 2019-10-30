@@ -426,7 +426,7 @@
     }
 
     .TreeView {
-        max-height: 100vh;
+        max-height: 70vh;
         overflow-y: auto;
     }
 
