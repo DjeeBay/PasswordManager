@@ -17,7 +17,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/BosketTreeView.css') }}" rel="stylesheet">
 </head>
-<body class="app sidebar-md-show">
+<body class="app sidebar-lg-show">
 @include('includes.header')
 <div id="app" class="app-body">
     <notifications></notifications>
