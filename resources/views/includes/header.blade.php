@@ -4,7 +4,7 @@
     </button>
 
             <a class="navbar-brand" href="{{ url('/') }}">
-                {{ config('app.name', 'KeePassManager') }}
+                <span class="w-100 text-center">{{ config('app.name', 'KeePassManager') }}</span>
             </a>
 
                 <!-- Left Side Of Navbar -->

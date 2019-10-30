@@ -2,7 +2,7 @@
     <div>
         <div id="btnGroup" class="mb-2">
             <div class="floatLeftBtn">
-                <button v-on:click="showTree = !showTree" type="button" class="btn btn-dark rounded"><i :class="[showTree ? 'cui-minus' : 'cui-plus']"></i></button>
+                <button v-on:click="showTree = !showTree" type="button" class="btn btn-dark rounded border-white"><i :class="[showTree ? 'cui-minus' : 'cui-plus']"></i></button>
             </div>
             <div>
                 <button v-on:click="openAddFolderModal()" type="button" class="btn btn-primary rounded"><i class="cui-plus"></i> <i class="cui-folder"></i></button>
@@ -356,11 +356,19 @@
             this.model = JSON.parse(JSON.stringify(this.items))
 
             let btnGroup = document.getElementById('btnGroup')
+            let btnFloatLeft = document.getElementsByClassName('floatLeftBtn')
             window.addEventListener('scroll', function () {
                 if (window.pageYOffset > 100) {
                     btnGroup.classList.add('sticked')
+                    if (btnFloatLeft && btnFloatLeft.length) {
+                        btnFloatLeft[0].style.float = 'initial'
+                    }
                 } else {
                     btnGroup.classList.remove('sticked')
+                    if (btnFloatLeft && btnFloatLeft.length) {
+                        console.log('ok')
+                        btnFloatLeft[0].style.float = 'left'
+                    }
                 }
             })
 
@@ -402,7 +410,7 @@
         display: inline-block;
     }
 
-    .floatLeftBtn {float: left !important;}
+    .floatLeftBtn {float: left;}
 
     .notes {
         max-height: 120px;
@@ -426,14 +434,14 @@
         max-width: 200px;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 992px) {
         .sticked {
             right: 35px;
             top: 15px;
         }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
         .colTreeView {
             padding: 0 !important;
         }
