@@ -183,6 +183,25 @@
                         </div>
                     @endforeach
                 </div>
+
+                <hr>
+                <div class="row">
+                    <div class="col-12"><h4>Historic permissions</h4></div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Read')}}</div>
+                            {{html()->label()->class('switch switch-warning')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('read historic')->checked(isset($user) && $user->can('read historic'))->id('readHistoric')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <div>{{html()->label('Restore deleted keepass')}}</div>
+                            {{html()->label()->class('switch switch-warning')->html(
+                                html()->checkbox('permissions[]', old('permissions[]'))->value('restore historic')->checked(isset($user) && $user->can('restore historic'))->id('restoreHistoric')->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
 

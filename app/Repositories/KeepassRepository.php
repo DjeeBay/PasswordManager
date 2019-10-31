@@ -6,9 +6,11 @@ namespace App\Repositories;
 use App\Interfaces\KeepassRepositoryInterface;
 use App\Models\Category;
 use App\Models\Keepass;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class KeepassRepository implements KeepassRepositoryInterface
@@ -123,6 +125,39 @@ class KeepassRepository implements KeepassRepositoryInterface
         });
 
         return $imported;
+    }
+
+    public function getHistoric(array $parameters = [])
+    {
+        /** @var Builder $query */
+        $query = Keepass::withTrashed();
+
+        if (Arr::has($parameters, 'sortBy')) {
+            switch (Arr::get($parameters, 'sortBy')) {
+                case 'created':
+                    $query->orderByDesc('created_at');
+                    break;
+                case 'deleted':
+                    $query->orderByDesc('deleted_at');
+                    break;
+                default:
+                    $query->orderByDesc('updated_at');
+            }
+        } else {
+            $query->orderByDesc('updated_at');
+        }
+
+        if (Arr::has($parameters, 'category') && $parameters['category']) {
+            $query->where('category_id', '=', Arr::get($parameters, 'category'));
+        } else {
+            $query->whereIn('category_id', Auth::user()->categories->pluck('id')->toArray());
+        }
+
+        if (Arr::has($parameters, 'title') && $parameters['title']) {
+            $query->where('title', 'like', '%'.Arr::get($parameters, 'title').'%');
+        }
+
+        return $query->simplePaginate(15);
     }
 
     private function createKeepassesRecursively(KeepassRepositoryInterface $keepassRepository, Category $category, array $groups, $parentID = null)
