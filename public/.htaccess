@@ -19,6 +19,13 @@
     Header set X-XSS-Protection "1; mode=block"
     Header always append X-Frame-Options SAMEORIGIN
     Header set X-Content-Type-Options nosniff
+	
+	Header set Content-Security-Policy "default-src 'none'"
+    Header set Content-Security-Policy "font-src 'self'"
+    Header set Content-Security-Policy "img-src 'self'"
+	Header set Content-Security-Policy "script-src 'self'" 
+    Header set Content-Security-Policy "connect-src 'self'"
+    Header set Content-Security-Policy "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/"		
 </IfModule>
 
 <IfModule mod_rewrite.c>
