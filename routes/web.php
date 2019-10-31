@@ -28,4 +28,7 @@ Route::middleware(['auth'])->group(function() {
     Route::delete('/keepass/{category_id}/delete/{id}', 'KeepassController@delete')->name('keepass.delete');
     Route::post('/keepass/{category_id}/save', 'KeepassController@save')->name('keepass.save');
     Route::post('/keepass/import', 'KeepassController@import')->name('keepass.import');
+
+    Route::get('/historic/index', 'HistoricController@index')->name('historic.index');
+    Route::get('/historic/restore/{id}', 'HistoricController@restore')->name('historic.restore');
 });

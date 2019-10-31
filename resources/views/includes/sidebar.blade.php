@@ -29,6 +29,15 @@
                     $colorIndex++;
                 @endphp
             @endforeach
+
+            @if (Auth::user()->is_admin || Auth::user()->can('read historic'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route('historic.index')}}">
+                        <i class="nav-icon cui-history text-info"></i> Historic
+                    </a>
+                </li>
+            @endif
+
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">
                     <i class="nav-icon cui-settings"></i> Settings
