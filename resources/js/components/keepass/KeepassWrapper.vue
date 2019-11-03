@@ -235,7 +235,7 @@
                     icons: this.icons,
                     saveRoute: this.saveRoute
                 }
-                this.$modal.show(AddKeepassFolderModal, props, {adaptive: true, height: 'auto', classes: 'v--modal overflowInitial'})
+                this.$modal.show(AddKeepassFolderModal, props, {adaptive: true, height: 'auto', classes: 'v--modal overflowAuto modalMaxHeight'})
             },
             openDeleteFolderModal() {
                 if (this.selection && this.selection.length) {
@@ -254,7 +254,7 @@
                         keepass: keepass,
                         saveRoute: this.saveRoute,
                     }
-                    this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', classes: 'v--modal overflowInitial'})
+                    this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', classes: 'v--modal overflowAuto modalMaxHeight'})
                 }
             },
             removeFolder(keepass) {
