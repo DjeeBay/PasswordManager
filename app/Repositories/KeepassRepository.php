@@ -35,6 +35,7 @@ class KeepassRepository implements KeepassRepositoryInterface
             $this->model->password = Arr::get($attributes, 'password') ? encrypt(Arr::get($attributes, 'password')) : null;
             $this->model->url = Arr::get($attributes, 'url');
             $this->model->notes = Arr::get($attributes, 'notes');
+            $this->model->icon_id = Arr::get($attributes, 'icon_id');
             $this->model->save();
             $entity = $this->model;
         });
@@ -54,6 +55,7 @@ class KeepassRepository implements KeepassRepositoryInterface
                 'password' => Arr::get($attributes, 'password') ? encrypt(Arr::get($attributes, 'password')) : null,
                 'url' => Arr::get($attributes, 'url'),
                 'notes' => Arr::get($attributes, 'notes'),
+                'icon_id' => Arr::get($attributes, 'icon_id'),
             ]);
         });
 

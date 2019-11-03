@@ -7,7 +7,6 @@
         <title>Laravel</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
 
         <!-- Styles -->
         <style>
@@ -81,7 +80,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    KeePass Manager
+                    KeePassManager
                 </div>
             </div>
         </div>

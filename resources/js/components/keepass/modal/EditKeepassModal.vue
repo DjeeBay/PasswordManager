@@ -1,6 +1,12 @@
 <template>
     <div class="border-primary h100">
-        <div class="card-header bg-primary">{{keepass.id ? 'Edit' : 'New'}} {{keepass.title}}</div>
+        <div class="card-header bg-primary">
+            <img v-if="keepassComputed.icon_id && keepassComputed.icon" :src="'/storage/'+keepassComputed.icon.path" :alt="keepassComputed.icon.filename" class="mr-1 float-left" height="20" width="20">
+            {{keepass.id ? 'Edit' : 'New'}} {{keepass.title}}
+            <button v-popover:entryIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cui-smile"></i></button>
+            {{keepass.icon_id}}
+            <icons-popover @icon-changed="updateIcon" :icons="icons" :keepass="keepass" :popover-name="'entryIcon'" :save-route="saveRoute"></icons-popover>
+        </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
@@ -58,11 +64,16 @@
     import {EventBus} from './../../../eventBus'
 
     export default {
-        name: 'DeleteModal',
+        name: 'EditKeepassModal',
         props: {
             deleteRoute: {
                 type: String,
                 required: true
+            },
+            icons: {
+                type: Array,
+                required: false,
+                default: []
             },
             keepass: {
                 type: Object,
@@ -99,7 +110,7 @@
                             EventBus.$emit('keepass-saved', res.data.keepass, !this.keepass.id)
                         }
                     })
-                        .catch(res => this.$notify({title: 'Error', text: res.response.status !== 500 ? res.response.data.message : 'Internal error.', type: 'error'}))
+                        .catch(response => this.$notify({title: 'Error', text: response.status !== 500 ? response.data.message : 'Internal error.', type: 'error'}))
                         .finally(() => this.close())
                 } else {
                     this.$notify({title: 'Warning', text: 'Please enter a title.', type: 'warn'})
@@ -122,6 +133,10 @@
                         }
                     }, 10)
                 }
+            },
+            updateIcon(keepass) {
+                this.keepassComputed.icon_id = keepass.icon_id
+                this.keepassComputed.icon = keepass.icon
             }
         },
         mounted() {
