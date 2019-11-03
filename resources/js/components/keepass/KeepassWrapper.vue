@@ -51,7 +51,7 @@
                             <template v-for="keepass in selection[0].children" v-if="!keepass.is_folder">
                                 <tr>
                                     <td>
-                                        <button type="button" v-on:click="openEditModal(keepass)" class="btn btn-sm btn-blue"><img v-if="keepass.icon_id && keepass.icon" :src="'/storage/'+keepass.icon.path" :alt="keepass.icon.filename" height="20" width="20"> {{keepass.title}}</button>
+                                        <button type="button" v-on:click="openEditModal(keepass)" class="btn btn-sm btn-blue"><img v-if="keepass.icon_id && keepass.icon" :src="'/storage/'+keepass.icon.path" :alt="keepass.icon.filename" height="16" width="16"> {{keepass.title}}</button>
                                     </td>
                                     <td v-on:click="copy(keepass.login, 'Login')" class="handHover">{{keepass.login}}</td>
                                     <td v-on:click="copy(keepass.password, 'Password')" class="handHover"><i v-if="keepass.password">(length {{keepass.password.length}})</i></td>
@@ -313,28 +313,16 @@
                 return false
             },
             sortByProperty(sortable, prop) {
-                return sortable.sort((a, b) => {
-                    let comparison = 0
-                    if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop)) {
-                        let first = a.title.toUpperCase()
-                        let second = b.title.toUpperCase()
-                        if (first > second) {
-                            comparison = -1
-                        } else if (first < second) {
-                            comparison = 1
-                        }
-
-                        return comparison
-                    }
-                })
+                sortable.sort((a, b) => a[prop].localeCompare(b[prop]))
             },
             sortChildrenByTitle() {
                 if (this.selection && this.selection.length && this.selection[0].children && this.selection[0].children.length) {
-                    this.selection[0].children = this.sortByProperty(this.selection[0].children, 'title')
+                    this.sortByProperty(this.selection[0].children, 'title')
                 }
             },
             sortTreeView(a, b) {
                 const sameChildrenState = 'children' in a === 'children' in b
+                if (!a.is_folder && !b.is_folder) return 0
                 if (sameChildrenState) {
                     return a.title.localeCompare(b.title)
                 } else if ('children' in a) {

@@ -5,7 +5,7 @@ namespace App\Http\Requests\Keepass;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class ImportKeepassController extends FormRequest
+class ImportKeepassRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,6 +26,7 @@ class ImportKeepassController extends FormRequest
     {
         return [
             'xml' => 'required|file|mimes:xml',
+            'with_icons' => 'boolean',
             'category_name' => 'string|required|unique:categories,name,'.$this->category_name
         ];
     }

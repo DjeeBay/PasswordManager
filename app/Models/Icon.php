@@ -14,6 +14,7 @@ class Icon extends Model
     protected $fillable = [
         'path',
         'filename',
-        'title'
+        'title',
+        'is_deletable'
     ];
 }

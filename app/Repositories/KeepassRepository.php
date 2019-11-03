@@ -5,6 +5,7 @@ namespace App\Repositories;
 
 use App\Interfaces\KeepassRepositoryInterface;
 use App\Models\Category;
+use App\Models\Icon;
 use App\Models\Keepass;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -105,12 +106,43 @@ class KeepassRepository implements KeepassRepositoryInterface
         return $folders;
     }
 
-    public function processXml(\SimpleXMLElement $xml, $categoryName) : bool
+    public function processXml(\SimpleXMLElement $xml, $categoryName, bool $withIcons) : bool
     {
         $imported = false;
-        DB::transaction(function() use ($xml, $categoryName, &$imported) {
+        DB::transaction(function() use ($xml, $categoryName, $withIcons, &$imported) {
             $categoryRepository = app(CategoryRepository::class);
             $category = $categoryRepository->create(['name' => $categoryName]);
+
+            $icons = Icon::all();
+            $icons->each(function ($icon) {$icon->identifier = (string)($icon->id - 1);});
+            $meta = $xml->xpath('Meta');
+            if ($withIcons && $meta && count($meta)) {
+                $customIcons = $meta[0]->xpath('CustomIcons');
+                if ($customIcons && count($customIcons)) {
+                    $iconsData = $customIcons[0]->xpath('Icon');
+                    $nbIconsData = count($iconsData);
+                    if ($iconsData && $nbIconsData) {
+                        $modelIcon = new Icon();
+                        for ($i = 0; $i < $nbIconsData; $i++) {
+                            $base64 = $iconsData[$i]->xpath('Data');
+                            $uuid = $iconsData[$i]->xpath('UUID');
+                            if ($base64 && count($base64) && $uuid && count($uuid)) {
+                                $storagePath = storage_path('app/public/');
+                                $filename = uniqid($i).'.png';
+                                $path = 'img/icons/'.$filename;
+                                file_put_contents($storagePath.$path, base64_decode((string)$base64[0]));
+                                $createdIcon = $modelIcon->create([
+                                    'path' => $path,
+                                    'filename' => $filename,
+                                    'is_deletable' => 1
+                                ]);
+                                $createdIcon->identifier = (string)$uuid[0];
+                                $icons->push($createdIcon);
+                            }
+                        }
+                    }
+                }
+            }
 
             $root = $xml->xpath('Root');
             if ($root && count($root)) {
@@ -118,7 +150,7 @@ class KeepassRepository implements KeepassRepositoryInterface
                 if ($mainGroup && count($mainGroup)) {
                     $groups = $mainGroup[0]->xpath('Group');
                     if ($groups) {
-                        $this->createKeepassesRecursively(app(KeepassRepository::class), $category, $groups);
+                        $this->createKeepassesRecursively(app(KeepassRepository::class), $category, $groups, $withIcons ? $icons : collect());
                     }
                 }
             }
@@ -162,18 +194,21 @@ class KeepassRepository implements KeepassRepositoryInterface
         return $query->simplePaginate(15);
     }
 
-    private function createKeepassesRecursively(KeepassRepositoryInterface $keepassRepository, Category $category, array $groups, $parentID = null)
+    private function createKeepassesRecursively(KeepassRepositoryInterface $keepassRepository, Category $category, array $groups, \Illuminate\Support\Collection $icons, $parentID = null)
     {
         foreach ($groups as $group) {
+            $xmlIconID = (string) $group->CustomIconUUID && strlen((string) $group->CustomIconUUID) ? (string) $group->CustomIconUUID : (string) $group->IconID;
             $folder = $keepassRepository->create([
                 'title' => (string) $group->Name,
                 'category_id' => $category->id,
                 'is_folder' => 1,
-                'parent_id' => $parentID
+                'parent_id' => $parentID,
+                'icon_id' => $icons->whereStrict('identifier', $xmlIconID)->pluck('id')->first()
             ]);
             $entries = $group->xpath('Entry');
             if ($entries && is_array($entries)) {
                 foreach ($entries as $entry) {
+                    $xmlEntryIconID = (string) $entry->CustomIconUUID && strlen((string) $entry->CustomIconUUID) ? (string) $entry->CustomIconUUID : (string) $entry->IconID;
                     $params = [
                         'title' => null,
                         'category_id' => $category->id,
@@ -183,7 +218,9 @@ class KeepassRepository implements KeepassRepositoryInterface
                         'password' => null,
                         'url' => null,
                         'notes' => null,
+                        'icon_id' => $icons->whereStrict('identifier', $xmlEntryIconID)->pluck('id')->first(),
                     ];
+
                     $columns = $entry->xpath('String');
                     if ($columns && is_array($columns)) {
                         /** @var \SimpleXMLElement $column */
@@ -222,7 +259,7 @@ class KeepassRepository implements KeepassRepositoryInterface
             }
             $children = $group->xpath('Group');
             if ($children && is_array($children)) {
-                $this->createKeepassesRecursively($keepassRepository, $category, $children, $folder->id);
+                $this->createKeepassesRecursively($keepassRepository, $category, $children, $icons, $folder->id);
             }
         }
     }

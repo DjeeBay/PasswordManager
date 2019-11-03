@@ -18,8 +18,8 @@
                 </div>
             </div>
             <div class="row">
-                <div v-for="(icon, i) in icons" :key="i" class="col-2 text-center" :class="[keepass.icon_id === icon.id ? 'border border-danger' : '']">
-                    <img v-on:click="saveIcon(icon)" :src="'/storage/'+icon.path" :alt="icon.filename" height="20" width="20">
+                <div v-for="(icon, i) in icons" :key="i" v-on:click="saveIcon(icon)" class="col-2 text-center handHover" :class="[keepass.icon_id === icon.id ? 'border border-danger' : '']">
+                    <img :src="'/storage/'+icon.path" :alt="icon.filename" height="20" width="20">
                 </div>
             </div>
         </div>
