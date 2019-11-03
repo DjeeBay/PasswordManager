@@ -3,7 +3,8 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-            <a class="navbar-brand" href="{{ url('/') }}">
+            <a class="navbar-brand pl-lg-5" href="{{ url('/') }}">
+                <img class="mr-1" src="{{asset('img/logo.png')}}" height="25" alt="KeePassManager Logo">
                 <span class="w-100 text-center">{{ config('app.name', 'KeePassManager') }}</span>
             </a>
 

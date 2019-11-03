@@ -1,5 +1,4 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
 
 // Variables
 @import 'variables';
@@ -20,6 +19,8 @@
 }
 
 .handHover {cursor: pointer;}
+
+.overflowInitial {overflow: initial !important;}
 
 .text-blue {color: $blue !important;}
 .text-purple {color: $purple !important;}

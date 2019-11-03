@@ -1,7 +1,7 @@
-<h1 align="center">Keepass Manager</h1>
+<h1 align="center">KeepassManager</h1>
 
 ### Introduction
-Keepass Manager is a KeePass-like web application (mobile friendly).
+KeepassManager is a KeePass-like web application (mobile friendly).
 <br>
 You can :
 <ul>
@@ -21,6 +21,7 @@ You can :
 composer install
 php artisan migrate
 php artisan db:seed
+php artisan storage:link
 npm install
 npm run prod
 ```
@@ -39,3 +40,5 @@ You will have to create an admin account in database yourself by using standard 
 <li>vue-js-modal</li>
 <li>vue-js-notification</li>
 </ul>
+
+And of course thanks to the original KeePass software.

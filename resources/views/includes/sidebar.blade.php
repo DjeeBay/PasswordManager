@@ -53,6 +53,13 @@
                             <i class="nav-icon cui-people"></i> Users
                         </a>
                     </li>
+                    @if (Auth::user()->is_admin || Auth::user()->can('create keepass') || Auth::user()->can('edit keepass'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('icon.index')}}">
+                                <i class="nav-icon cui-smile"></i> Icons
+                            </a>
+                        </li>
+                    @endif
                     @if (Auth::user()->is_admin || Auth::user()->can('import keepass'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('keepass.get_import')}}">

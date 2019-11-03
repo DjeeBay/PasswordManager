@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Keepass\DeleteKeepassRequest;
 use App\Http\Requests\Keepass\GetKeepassRequest;
-use App\Http\Requests\Keepass\ImportKeepassController;
+use App\Http\Requests\Keepass\ImportKeepassRequest;
 use App\Http\Requests\Keepass\SaveKeepassRequest;
 use App\Interfaces\KeepassRepositoryInterface;
 use App\Models\Category;
@@ -135,10 +135,10 @@ class KeepassController extends Controller
         return redirect()->route('home');
     }
 
-    public function import(ImportKeepassController $request)
+    public function import(ImportKeepassRequest $request)
     {
         $xml = simplexml_load_file($request->file('xml'));
-        if (!$xml || !$this->repository->processXml($xml, $request->category_name)) {
+        if (!$xml || !$this->repository->processXml($xml, $request->category_name, $request->with_icons ? true : false)) {
             return back()->withErrors(['Invalid xml.']);
         }
 
