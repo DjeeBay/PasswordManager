@@ -2,13 +2,14 @@
 
 ### Introduction
 KeepassManager is a KeePass-like web application (mobile friendly).
-<br>
-You can :
+
+### Features
 <ul>
 <li>Manage users and give them permissions</li>
 <li>Manage categories</li>
 <li>Edit your keepass hierarchy as you want</li>
 <li>Import existing KeePass (XML)</li>
+<li>Icon management</li>
 </ul>
 
 <p align="center">

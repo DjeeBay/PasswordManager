@@ -20,7 +20,9 @@
 
 .handHover {cursor: pointer;}
 
-.overflowInitial {overflow: initial !important;}
+.modalMaxHeight {max-height: 80vh;}
+
+.overflowAuto {overflow: auto !important;}
 
 .text-blue {color: $blue !important;}
 .text-purple {color: $purple !important;}

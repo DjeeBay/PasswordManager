@@ -63,6 +63,7 @@
                                 this.keepass.icon_id = res.data.keepass.icon_id
                                 this.keepass.icon = res.data.keepass.icon
                             } else {
+                                this.keepass.icon_id = res.data.keepass.icon_id
                                 EventBus.$emit('keepass-saved', res.data.keepass, false)
                             }
                         }
@@ -132,6 +133,7 @@
     @media (max-width: 992px) {
         div[data-popover$="Icon"] {
             left: 0 !important;
+            max-height: 400px;
         }
     }
 </style>
