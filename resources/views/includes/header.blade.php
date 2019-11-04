@@ -3,8 +3,9 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-            <a class="navbar-brand" href="{{ url('/') }}">
-                {{ config('app.name', 'KeePassManager') }}
+            <a class="navbar-brand pl-lg-5" href="{{ url('/') }}">
+                <img class="mr-1" src="{{asset('img/logo.png')}}" height="25" alt="KeePassManager Logo">
+                <span class="w-100 text-center">{{ config('app.name', 'KeePassManager') }}</span>
             </a>
 
                 <!-- Left Side Of Navbar -->
@@ -26,7 +27,7 @@
                                 {{ __('Logout') }}
                             </a>
 
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>
                         </div>

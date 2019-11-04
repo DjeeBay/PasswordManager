@@ -21,6 +21,7 @@
                 <div class="col-md-12">
                     <keepass-wrapper
                         :category-id="{{$category->id}}"
+                        :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'
                         save-route="{{route('keepass.save', $category->id)}}"
                     ></keepass-wrapper>

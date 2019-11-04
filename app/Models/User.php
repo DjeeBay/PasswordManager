@@ -13,7 +13,6 @@ use Wildside\Userstamps\Userstamps;
 class User extends Authenticatable
 {
     use HasRoles,
-        HasPermissions,
         Notifiable,
         SoftDeletes,
         Userstamps;

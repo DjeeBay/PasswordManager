@@ -1,5 +1,4 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
 
 // Variables
 @import 'variables';
@@ -21,10 +20,27 @@
 
 .handHover {cursor: pointer;}
 
+.modalMaxHeight {max-height: 80vh;}
+
+.overflowAuto {overflow: auto !important;}
+
 .text-blue {color: $blue !important;}
 .text-purple {color: $purple !important;}
 .text-green {color: $green !important;}
 .text-red {color: $red !important;}
+
+.TreeView .opener:after {
+    content: '' !important;
+}
+
+.TreeView ul {
+    padding-left: 15px;
+}
+
+.TreeView ul li > .item > a {
+    width: 100% !important;
+    margin-right: 0 !important;
+}
 
 @media (max-width: 768px) {
     .main .container-fluid {

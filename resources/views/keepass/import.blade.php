@@ -26,6 +26,12 @@
                     </div>
                 </div>
                 <div class="col-md-12">
+                    <div class="form-group form-check">
+                        {{html()->checkbox('with_icons', old('with_icons'))->class('form-check-input')}}
+                        {{html()->label('Import icons (can duplicate existing icons if they exist in another category)', 'with_icons')->class('form-check-label')}}
+                    </div>
+                </div>
+                <div class="col-md-12">
                     <div class="form-group">
                         <label for="import">Select XML to import</label>
                         {{html()->file('xml')->id('import')->accept('.xml')}}

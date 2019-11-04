@@ -48,7 +48,7 @@
             },
             submit(e) {
                 if (!this.interval) {
-                    this.interval = setInterval(() => {console.log('o')
+                    this.interval = setInterval(() => {
                         this.counter++
                         if (this.counter >= 500) {
                             this.cancelSubmit()

@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Nunito);@charset "UTF-8";/*!
+@charset "UTF-8";/*!
  * CoreUI - Open Source Dashboard UI Kit
  * @version v2.1.12
  * @link https://coreui.io
@@ -33,6 +33,14 @@
   cursor: pointer;
 }
 
+.modalMaxHeight {
+  max-height: 80vh;
+}
+
+.overflowAuto {
+  overflow: auto !important;
+}
+
 .text-blue {
   color: #3490dc !important;
 }
@@ -47,6 +55,19 @@
 
 .text-red {
   color: #e3342f !important;
+}
+
+.TreeView .opener:after {
+  content: "" !important;
+}
+
+.TreeView ul {
+  padding-left: 15px;
+}
+
+.TreeView ul li > .item > a {
+  width: 100% !important;
+  margin-right: 0 !important;
 }
 
 @media (max-width: 768px) {

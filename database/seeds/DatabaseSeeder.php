@@ -14,5 +14,7 @@ class DatabaseSeeder extends Seeder
          $this->call(UserPermissionsSeeder::class);
          $this->call(CategoryPermissionsSeeder::class);
          $this->call(KeepassPermissionsSeeder::class);
+         $this->call(HistoricPermissionsSeeder::class);
+         $this->call(DefaultIconsSeeder::class);
     }
 }

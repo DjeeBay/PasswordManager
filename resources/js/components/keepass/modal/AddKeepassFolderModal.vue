@@ -1,6 +1,11 @@
 <template>
     <div class="border-primary h100">
-        <div class="card-header bg-primary">New folder</div>
+        <div class="card-header bg-primary">
+            <img v-if="keepass.icon_id && keepass.icon" :src="'/storage/'+keepass.icon.path" :alt="keepass.icon.filename" class="mr-1 float-left" height="20" width="20">
+            New folder
+            <button v-popover:newFolderIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cui-smile"></i></button>
+            <icons-popover @icon-changed="updateIcon" :icons="icons" :keepass="keepass" :popover-name="'newFolderIcon'" :save-route="saveRoute"></icons-popover>
+        </div>
         <div class="card-body">
             <div class="row">
                 <div class="col">
@@ -31,6 +36,11 @@
                 type: Number,
                 required: true
             },
+            icons: {
+                type: Array,
+                required: false,
+                default: []
+            },
             parentId: {
                 type: Number|null,
                 required: true
@@ -60,6 +70,9 @@
                     this.$notify({title: 'Warning', text: 'Please enter a title.', type: 'warn'})
                 }
             },
+            updateIcon(keepass) {
+                this.keepass = JSON.parse(JSON.stringify(keepass))
+            }
         },
         mounted() {
             this.keepass.category_id = this.categoryId
@@ -71,6 +84,8 @@
                     title: null,
                     category_id: null,
                     is_folder: 1,
+                    icon_id: null,
+                    icon: null,
                     parent_id: null
                 },
             }

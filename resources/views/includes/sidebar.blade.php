@@ -29,6 +29,15 @@
                     $colorIndex++;
                 @endphp
             @endforeach
+
+            @if (Auth::user()->is_admin || Auth::user()->can('read historic'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route('historic.index')}}">
+                        <i class="nav-icon cui-history text-info"></i> Historic
+                    </a>
+                </li>
+            @endif
+
             <li class="nav-item nav-dropdown">
                 <a class="nav-link nav-dropdown-toggle" href="#">
                     <i class="nav-icon cui-settings"></i> Settings
@@ -44,6 +53,13 @@
                             <i class="nav-icon cui-people"></i> Users
                         </a>
                     </li>
+                    @if (Auth::user()->is_admin || Auth::user()->can('create keepass') || Auth::user()->can('edit keepass'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('icon.index')}}">
+                                <i class="nav-icon cui-smile"></i> Icons
+                            </a>
+                        </li>
+                    @endif
                     @if (Auth::user()->is_admin || Auth::user()->can('import keepass'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('keepass.get_import')}}">

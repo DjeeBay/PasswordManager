@@ -20,5 +20,23 @@ class Keepass extends Model
         'password',
         'url',
         'notes',
+        'icon_id',
     ];
+
+    protected $appends = ['icon'];
+
+    public function category()
+    {
+        return $this->hasOne(Category::class, 'id', 'category_id');
+    }
+
+    public function icon()
+    {
+        return $this->hasOne(Icon::class, 'id', 'icon_id');
+    }
+
+    public function getIconAttribute()
+    {
+        return $this->icon()->first();
+    }
 }
