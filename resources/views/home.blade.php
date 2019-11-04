@@ -38,7 +38,7 @@
                         $bg = $backgrounds[$bgIndex];
                     @endphp
                     <div class="col-sm-6 col-lg-3">
-                        <a style="text-decoration: none;" href="{{route('keepass.get', $category->id)}}">
+                        <a class="text-decoration-none" href="{{route('keepass.get', $category->id)}}">
                             <div class="card text-white {{$bg}}">
                                 <div class="card-body">
                                     <div class="text-value">{{$category->name}}</div>
