@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserRepositoryInterface
@@ -36,7 +37,7 @@ class UserRepository implements UserRepositoryInterface
             $entity = $this->model;
 
             $entity->syncPermissions(Arr::get($attributes, 'permissions'));
-            $this->syncCategories($entity, Arr::get($attributes, 'categories') ?? [], true);
+            $this->syncCategories($entity, Arr::get($attributes, 'categories') ?? []);
         });
 
         return $entity;
@@ -53,6 +54,7 @@ class UserRepository implements UserRepositoryInterface
                 'is_admin' => Arr::get($attributes, 'is_admin', 0),
                 'email' => Arr::get($attributes, 'email')
             ]);
+//            dd(Arr::get($attributes, 'categories'));
 
             /** @var User $entity */
             $entity->syncPermissions(Arr::get($attributes, 'permissions'));
@@ -73,17 +75,18 @@ class UserRepository implements UserRepositoryInterface
         // TODO: Implement get() method.
     }
 
-    private function syncCategories(User $user, array $categories, $createOnly = false)
+    private function syncCategories(User $user, array $categories)
     {
-        $userCategoryRepository = app(UserCategoriesRepository::class);
-        if (!$createOnly) {
+        if (Auth::user()->is_admin || Auth::user()->can('manage user permissions')) {
+            if ($user->is_admin) {
+                $categories = Category::all()->pluck('id')->toArray();
+            }
             UserCategory::where('user_id', '=', $user->id)->delete();
+            $userCategoryRepository = app(UserCategoriesRepository::class);
+            foreach ($categories as $category) {
+                $userCategoryRepository->create(['user_id' => $user->id, 'category_id' => $category]);
+            }
         }
-        if ($user->is_admin) {
-            $categories = Category::all()->pluck('id')->toArray();
-        }
-        foreach ($categories as $category) {
-            $userCategoryRepository->create(['user_id' => $user->id, 'category_id' => $category]);
-        }
+
     }
 }
