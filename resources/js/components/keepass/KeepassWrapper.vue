@@ -94,6 +94,7 @@
     import AddKeepassFolderModal from './modal/AddKeepassFolderModal'
     import DeleteModal from './../common/DeleteModal'
     import IconsPopover from './popover/IconsPopover'
+    import {utilsMixin} from './../../mixins/utilsMixin'
 
     function dragndropToConsumableArray(arr) {
         if (Array.isArray(arr)) {
@@ -108,7 +109,12 @@
     export default {
         name: 'KeepassWrapper',
         components: {IconsPopover, TreeView},
+        mixins: [utilsMixin],
         props: {
+            addFavoritesRoute: {
+                type: String,
+                required: true
+            },
             categoryId: {
                 type: Number,
                 required: true
@@ -134,7 +140,13 @@
         },
         methods: {
             addToFavorites() {
-
+                if (this.entriesSelected.length) {
+                    axios.post(this.addFavoritesRoute, {keepasses: this.entriesSelected}).then(res => {
+                        if (res.data) {
+                            this.$notify({title: 'Success', text: 'Added to favorites !', type: 'success'})
+                        }
+                    })
+                }
             },
             addFolder(keepass) {
                 keepass.children = []
@@ -143,35 +155,6 @@
                 } else {
                     this.model.push(keepass)
                 }
-            },
-            copy(value, type) {
-                if (value && value !== '<!---->') {
-                    if (navigator.userAgent.match(/ipad|iphone/i) || navigator.userAgent.indexOf('Safari') !== -1 && navigator.userAgent.indexOf('Chrome') === -1) {
-                        this.copyFromInput(value, type)
-                    } else {
-                        navigator.permissions.query({name: 'clipboard-write'}).then(res => {
-                            if (res.state === 'granted' || res.state === 'prompt') {
-                                navigator.clipboard.writeText(value).then(() => {
-                                    this.$notify({text: type+' copied !'})
-                                }, () => {
-                                    this.$notify({text: type+' not copied !', type: 'error'})
-                                });
-                            } else {
-                                this.copyFromInput(value, type)
-                            }
-                        }).catch(error => this.copyFromInput(value, type))
-                    }
-                }
-            },
-            copyFromInput(value, type) {
-                let fakeInput = document.createElement('textarea')
-                document.body.appendChild(fakeInput)
-                fakeInput.value = value
-                fakeInput.select()
-                fakeInput.setSelectionRange(0, 99999)
-                document.execCommand('copy')
-                document.body.removeChild(fakeInput)
-                this.$notify({text: type+' copied !'})
             },
             delete(keepass) {
                 let index = this.selection[0].children.findIndex(k => k.id === keepass.id)

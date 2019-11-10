@@ -20,6 +20,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <keepass-wrapper
+                        add-favorites-route="{{route('favorite.add-multiple')}}"
                         :category-id="{{$category->id}}"
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'

@@ -35,4 +35,8 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('/historic/index', 'HistoricController@index')->name('historic.index');
     Route::get('/historic/restore/{id}', 'HistoricController@restore')->name('historic.restore');
+
+    Route::get('/favorite/index', 'FavoriteController@index')->name('favorite.index');
+    Route::post('/favorite/removeMultiple', 'FavoriteController@removeMultiple')->name('favorite.remove-multiple');
+    Route::post('/favorite/addMultiple', 'FavoriteController@addMultiple')->name('favorite.add-multiple');
 });
