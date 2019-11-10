@@ -8,6 +8,7 @@ use App\Favorite;
 use App\Interfaces\FavoriteRepositoryInterface;
 use App\Models\Category;
 use App\Models\UserCategory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -39,7 +40,12 @@ class FavoriteRepository implements FavoriteRepositoryInterface
 
     public function getList() : Collection
     {
-        $favorites = Favorite::with('keepass')->where('user_id', '=', Auth::user()->id)->get();
+        $favorites = Favorite::with('keepass')
+            ->where('user_id', '=', Auth::user()->id)
+            ->whereHas('keepass', function (Builder $q) {
+                $q->whereNull('deleted_at');
+            })
+            ->get();
         $favorites->each(function ($item) {
             $item->keepass->password = $item->keepass->password ? decrypt($item->keepass->password) : null;
         });

@@ -79,7 +79,9 @@ class KeepassRepository implements KeepassRepositoryInterface
         DB::transaction(function () use ($keepasses, $category_id, &$storedKeepasses) {
             foreach ($keepasses as $keepass) {
                 $keepass['category_id'] = $category_id;
-                array_push($storedKeepasses, $this->create($keepass));
+                $createdKeepass = $this->create($keepass);
+                $createdKeepass->password = $createdKeepass->password ? decrypt($createdKeepass->password) : null;
+                array_push($storedKeepasses, $createdKeepass);
             }
         });
 
