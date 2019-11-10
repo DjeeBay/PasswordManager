@@ -17,9 +17,11 @@
         <div class="row">
             <div v-if="showTree" class="col-md-3">
                 <TreeView
+                    class="border border-secondary"
                     :model="model"
                     :display="display"
                     category="children"
+                    :dragndrop="dragndrop()"
                     :selection="selection"
                     :onSelect="onSelect"
                     :transition="transition"
@@ -35,11 +37,18 @@
                     <button v-popover:folderIcon.bottom type="button" class="btn btn-sm btn-warning ml-1"><i class="cui-smile"></i></button>
                     <icons-popover :icons="icons" :keepass="selection[0]" :popover-name="'folderIcon'" :save-route="saveRoute"></icons-popover>
                 </div>
+                <div v-if="selection.length" class="mb-1">
+                    <button v-if="selectionHasEntries()" type="button" v-on:click="showSelection = !showSelection" class="btn btn-sm btn-secondary">Selection<span v-if="entriesSelected.length">&nbsp;({{entriesSelected.length}})</span></button>
+                    <button v-if="entriesSelected.length" type="button" v-on:click="entriesSelected = []" class="btn btn-sm btn-ghost-danger">Clear</button>
+                    <button v-if="entriesSelected.length" type="button" v-on:click="pasteEntries" class="btn btn-sm btn-ghost-primary">Paste</button>
+                    <button v-if="entriesSelected.length" type="button" v-on:click="addToFavorites" class="btn btn-sm btn-ghost-primary">Add to fav.</button>
+                </div>
                 <div v-if="selectionHasEntries()">
                     <div class="table-responsive table-sm">
                         <table class="table table-dark table-striped">
                             <thead>
                             <tr>
+                                <th v-if="showSelection"></th>
                                 <th>Title</th>
                                 <th>Login</th>
                                 <th>Password</th>
@@ -50,6 +59,9 @@
                             <tbody>
                             <template v-for="keepass in selection[0].children" v-if="!keepass.is_folder">
                                 <tr>
+                                    <td v-if="showSelection">
+                                        <input type="checkbox" v-on:click="$event.target.checked ? entriesSelected.push(keepass) : entriesSelected.splice(entriesSelected.indexOf(keepass), 1)" :checked="entriesSelected.indexOf(keepass) !== -1" class="custom-checkbox">
+                                    </td>
                                     <td>
                                         <button type="button" v-on:click="openEditModal(keepass)" class="btn btn-sm btn-blue"><img v-if="keepass.icon_id && keepass.icon" :src="'/storage/'+keepass.icon.path" :alt="keepass.icon.filename" height="16" width="16"> {{keepass.title}}</button>
                                     </td>
@@ -77,10 +89,21 @@
 <script>
     import {EventBus} from './../../eventBus'
     import {TreeView} from '@bosket/vue'
+    import {array, tree} from '@bosket/tools'
     import EditKeepassModal from './modal/EditKeepassModal'
     import AddKeepassFolderModal from './modal/AddKeepassFolderModal'
     import DeleteModal from './../common/DeleteModal'
     import IconsPopover from './popover/IconsPopover'
+
+    function dragndropToConsumableArray(arr) {
+        if (Array.isArray(arr)) {
+            let arr2 = Array(arr.length)
+            for (let i = 0; i < arr.length; i++) {
+                arr2[i] = arr[i]
+            }
+            return arr2
+        } else { return Array.from(arr) }
+    }
 
     export default {
         name: 'KeepassWrapper',
@@ -88,6 +111,10 @@
         props: {
             categoryId: {
                 type: Number,
+                required: true
+            },
+            createMultipleRoute: {
+                type: String,
                 required: true
             },
             iconList: {
@@ -106,6 +133,9 @@
             },
         },
         methods: {
+            addToFavorites() {
+
+            },
             addFolder(keepass) {
                 keepass.children = []
                 if (this.selection && this.selection.length) {
@@ -147,6 +177,50 @@
                 let index = this.selection[0].children.findIndex(k => k.id === keepass.id)
                 if (index !== -1) {
                     this.selection[0].children.splice(index, 1)
+                }
+            },
+            dragndrop() {
+                return {...this.dragndropselection(() => this.model, m => this.model = m)}
+            },
+            dragndropselection(model, cb) {
+                let self = this
+                return {
+                    draggable: true,
+                    droppable: true,
+                    drag: function drag(item, event, inputs) {
+                        event.dataTransfer && event.dataTransfer.setData("application/json", JSON.stringify(inputs.selection));
+                    },
+                    guard: function guard(target, event, inputs) {
+                        // Other data types
+                        if (event && event.dataTransfer && event.dataTransfer.types.indexOf("application/json") < 0) return false;
+                        // Prevent drop on self
+                        var selfDrop = function selfDrop() {
+                            return target && array(inputs.selection).contains(target);
+                        };
+                        // Prevent drop on child
+                        var childDrop = function childDrop() {
+                            return inputs.ancestors && inputs.ancestors.reduce(function (prev, curr) {
+                                return prev || array(inputs.selection).contains(curr);
+                            }, false);
+                        };
+
+                        return selfDrop() || childDrop();
+                    },
+                    drop: function drop(target, event, inputs) {
+                        let updatedModel = tree(model(), inputs.category).filter(function (e) {
+                            return inputs.selection.indexOf(e) < 0
+                        });
+                        let adjustedTarget = target ? target[inputs.category] && target[inputs.category] instanceof Array ? target : array(inputs.ancestors).last() : null
+                        if (adjustedTarget) adjustedTarget[inputs.category] = [].concat(dragndropToConsumableArray(adjustedTarget[inputs.category]), dragndropToConsumableArray(inputs.selection));else updatedModel = [].concat(dragndropToConsumableArray(updatedModel), dragndropToConsumableArray(inputs.selection))
+                        cb(updatedModel)
+                        let targetID = target ? target.id : null
+                        if (inputs.selection && inputs.selection.length && inputs.selection[0].parent_id !== targetID) {
+                            inputs.selection[0].parent_id = targetID
+                            axios.post(self.saveRoute, {keepass: inputs.selection[0]}).then(res => {
+                                if (res.data.keepass) self.$notify({title: 'Success', text: 'The folder has been moved !', type: 'success'})
+                            })
+                        }
+                    }
                 }
             },
             findParent(through, parentID) {
@@ -255,6 +329,23 @@
                         saveRoute: this.saveRoute,
                     }
                     this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', classes: 'v--modal overflowAuto modalMaxHeight'})
+                }
+            },
+            pasteEntries() {
+                if (this.entriesSelected.length && this.selection && this.selection.length) {
+                    let entries = []
+                    for (let i = 0; i < this.entriesSelected.length; i++) {
+                        let entry = JSON.parse(JSON.stringify(this.entriesSelected[i]))
+                        entry.id = null
+                        entry.parent_id = this.selection && this.selection.length ? this.selection[0].id : null
+                        entries.push(entry)
+                    }
+                    axios.post(this.createMultipleRoute, {keepasses: entries}).then(res => {
+                        if (res.data.keepasses) {
+                            this.selection[0].children.push(...res.data.keepasses)
+                            this.$notify({title: 'Success', text: 'Entries have been created !', type: 'success'})
+                        }
+                    })
                 }
             },
             removeFolder(keepass) {
@@ -377,6 +468,7 @@
         },
         data() {
             return {
+                entriesSelected: [],
                 icons: [],
                 model: [],
                 selection: [],
@@ -384,6 +476,7 @@
                     this.selection = newSelection
                     this.manageFolderIcons()
                 },
+                showSelection: false,
                 showTree: true,
                 transition: {
                     attrs: { appear: true },

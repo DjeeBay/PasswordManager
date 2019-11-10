@@ -24,6 +24,7 @@
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'
                         save-route="{{route('keepass.save', $category->id)}}"
+                        create-multiple-route="{{route('keepass.create-multiple', $category->id)}}"
                     ></keepass-wrapper>
                 </div>
             </div>

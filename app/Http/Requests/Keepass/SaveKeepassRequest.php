@@ -33,6 +33,7 @@ class SaveKeepassRequest extends FormRequest
             'keepass.url' => 'string|nullable',
             'keepass.notes' => 'string|nullable',
             'keepass.icon_id' => 'numeric|nullable',
+            'keepass.parent_id' => 'numeric|nullable',
         ];
     }
 }

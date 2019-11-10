@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Keepass\CreateMultipleKeepassesRequest;
 use App\Http\Requests\Keepass\DeleteKeepassRequest;
 use App\Http\Requests\Keepass\GetKeepassRequest;
 use App\Http\Requests\Keepass\ImportKeepassRequest;
@@ -113,10 +114,15 @@ class KeepassController extends Controller
     {
         $attributes = $request->keepass;
         $attributes['category_id'] = $category_id;
-        $keepass = !$request->has('keepass.id') ? $this->repository->create($attributes) : $this->repository->update(Keepass::findOrFail($request->json('keepass.id')), $attributes);
+        $keepass = !$request->has('keepass.id') || !$request->json('keepass.id') ? $this->repository->create($attributes) : $this->repository->update(Keepass::findOrFail($request->json('keepass.id')), $attributes);
         $keepass->password = $keepass->password ? decrypt($keepass->password) : null;
 
         return response()->json(['keepass' => $keepass]);
+    }
+
+    public function createMultiple(CreateMultipleKeepassesRequest $request, $category_id)
+    {
+        return response()->json(['keepasses' => $this->repository->createMultiple($request->keepasses, $category_id)]);
     }
 
     public function delete(DeleteKeepassRequest $request, $category_id, $id)

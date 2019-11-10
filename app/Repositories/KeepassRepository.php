@@ -73,6 +73,19 @@ class KeepassRepository implements KeepassRepositoryInterface
         // TODO: Implement get() method.
     }
 
+    public function createMultiple(array $keepasses, $category_id) : array
+    {
+        $storedKeepasses = [];
+        DB::transaction(function () use ($keepasses, $category_id, &$storedKeepasses) {
+            foreach ($keepasses as $keepass) {
+                $keepass['category_id'] = $category_id;
+                array_push($storedKeepasses, $this->create($keepass));
+            }
+        });
+
+        return $storedKeepasses;
+    }
+
     public function getStructuredItems($category_id)
     {
         $items = $this->model->where('category_id', '=', $category_id)
