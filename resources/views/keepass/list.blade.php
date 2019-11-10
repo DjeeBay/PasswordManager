@@ -20,10 +20,12 @@
             <div class="row">
                 <div class="col-md-12">
                     <keepass-wrapper
+                        add-favorites-route="{{route('favorite.add-multiple')}}"
                         :category-id="{{$category->id}}"
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'
                         save-route="{{route('keepass.save', $category->id)}}"
+                        create-multiple-route="{{route('keepass.create-multiple', $category->id)}}"
                     ></keepass-wrapper>
                 </div>
             </div>

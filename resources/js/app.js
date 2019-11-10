@@ -10,6 +10,8 @@ import '@fortawesome/fontawesome-free/js/all.min'
 import VModal from 'vue-js-modal'
 import Notifications from 'vue-notification'
 import Popover from 'vue-js-popover'
+import VueGoodTablePlugin from 'vue-good-table'
+import 'vue-good-table/dist/vue-good-table.css'
 
 window.Vue = require('vue');
 import Vuex from 'vuex'
@@ -30,6 +32,7 @@ Vue.use(Vuex)
 Vue.use(VModal, { dynamic: true, injectModalsContainer: true })
 Vue.use(Notifications)
 Vue.use(Popover)
+Vue.use(VueGoodTablePlugin)
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

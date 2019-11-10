@@ -30,6 +30,11 @@
                 @endphp
             @endforeach
 
+            <li class="nav-item">
+                <a class="nav-link" href="{{route('favorite.index')}}">
+                    <i class="nav-icon cui-star text-warning"></i> Favorites
+                </a>
+            </li>
             @if (Auth::user()->is_admin || Auth::user()->can('read historic'))
                 <li class="nav-item">
                     <a class="nav-link" href="{{route('historic.index')}}">

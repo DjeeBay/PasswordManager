@@ -14,3 +14,4 @@ yarn-error.log
 .idea
 /public/js/app.js
 /public/js/formValidation.js
+/public/js/DragDropTouch.js

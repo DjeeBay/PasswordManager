@@ -66,5 +66,6 @@
 <script src="{{ asset('js/app.js') }}"></script>
 @yield('scripts')
 <script src="{{asset('js/formValidation.js')}}"></script>
+<script src="{{asset('js/DragDropTouch.js')}}"></script>
 </body>
 </html>
