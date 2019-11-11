@@ -42,15 +42,15 @@ class Keepass extends Model
 
     public function getFullpathAttribute()
     {
-        $path = '/';
-        if (!$this->parent_id) return $path;
+        $parents = [];
+        if (!$this->parent_id) return '/';
         $hasParent = true;
         $parentID = $this->parent_id;
         $i = 0;
         while ($hasParent) {
             $parent = Keepass::where('id', '=', $parentID)->select('title', 'parent_id')->first();
             if ($parent) {
-                $path .= $parent->title.($parent->parent_id ? '/' : null);
+                array_push($parents, $parent->title);
                 if (!$parent->parent_id) {
                     $hasParent = false;
                 } else {
@@ -58,9 +58,9 @@ class Keepass extends Model
                 }
             }
             $i++;
-            if ($i > 30) dd($parent);
+            if ($i > 100) $hasParent = false;
         }
 
-        return $path;
+        return implode('/', array_reverse($parents));
     }
 }
