@@ -39,4 +39,28 @@ class Keepass extends Model
     {
         return $this->icon()->first();
     }
+
+    public function getFullpathAttribute()
+    {
+        $path = '/';
+        if (!$this->parent_id) return $path;
+        $hasParent = true;
+        $parentID = $this->parent_id;
+        $i = 0;
+        while ($hasParent) {
+            $parent = Keepass::where('id', '=', $parentID)->select('title', 'parent_id')->first();
+            if ($parent) {
+                $path .= $parent->title.($parent->parent_id ? '/' : null);
+                if (!$parent->parent_id) {
+                    $hasParent = false;
+                } else {
+                    $parentID = $parent->parent_id;
+                }
+            }
+            $i++;
+            if ($i > 30) dd($parent);
+        }
+
+        return $path;
+    }
 }

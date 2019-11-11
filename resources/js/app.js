@@ -29,7 +29,7 @@ const files = require.context('./', true, /\.vue$/i)
 files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.use(Vuex)
-Vue.use(VModal, { dynamic: true, injectModalsContainer: true })
+Vue.use(VModal, { dynamic: true, injectModalsContainer: true, dialog: true })
 Vue.use(Notifications)
 Vue.use(Popover)
 Vue.use(VueGoodTablePlugin)

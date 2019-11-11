@@ -5,7 +5,7 @@
             :columns="columns"
             :rows="favorites"
             :sort-options="{enabled: true, initialSortBy: {field: 'title'}}"
-            :selectOptions="{enabled: true, selectionText: 'favorite(s) selected'}"
+            :selectOptions="{enabled: true, selectionText: 'favorite(s) selected', selectOnCheckboxOnly: true}"
             theme="black-rhino"
             styleClass="vgt-table condensed striped"
         >
@@ -15,6 +15,7 @@
             <template slot="table-row" slot-scope="props">
                 <span v-if="props.column.field === 'title'">
                     <img v-if="props.row.icon_id && props.row.icon" :src="'/storage/'+props.row.icon.path" :alt="props.row.icon.filename" height="16" width="16"> {{props.row.title}}
+                    <div><small><em>({{props.row.fullpath}})</em></small></div>
                 </span>
                 <span v-else-if="props.column.field === 'password'">
                     <span v-on:click="copy(props.row.password, 'Password')" class="handHover"><i v-if="props.row.password">(length {{props.row.password.length}})</i></span>

@@ -190,17 +190,37 @@
                         return selfDrop() || childDrop();
                     },
                     drop: function drop(target, event, inputs) {
-                        let updatedModel = tree(model(), inputs.category).filter(function (e) {
-                            return inputs.selection.indexOf(e) < 0
-                        });
-                        let adjustedTarget = target ? target[inputs.category] && target[inputs.category] instanceof Array ? target : array(inputs.ancestors).last() : null
-                        if (adjustedTarget) adjustedTarget[inputs.category] = [].concat(dragndropToConsumableArray(adjustedTarget[inputs.category]), dragndropToConsumableArray(inputs.selection));else updatedModel = [].concat(dragndropToConsumableArray(updatedModel), dragndropToConsumableArray(inputs.selection))
-                        cb(updatedModel)
                         let targetID = target ? target.id : null
                         if (inputs.selection && inputs.selection.length && inputs.selection[0].parent_id !== targetID) {
-                            inputs.selection[0].parent_id = targetID
-                            axios.post(self.saveRoute, {keepass: inputs.selection[0]}).then(res => {
-                                if (res.data.keepass) self.$notify({title: 'Success', text: 'The folder has been moved !', type: 'success'})
+                            let bak = JSON.stringify(model());
+                            self.$modal.show('dialog', {
+                                title: 'Confirm drop',
+                                text: 'Move <b class="text-primary">'+inputs.selection[0].title+'</b> in <b class="text-danger">/'+(target ? target.title : '')+'</b> ?',
+                                buttons: [
+                                    {
+                                        title: 'Confirm',
+                                        handler: () => {
+                                            let updatedModel = tree(model(), inputs.category).filter(function (e) {
+                                                return inputs.selection.indexOf(e) < 0
+                                            });
+                                            let adjustedTarget = target ? target[inputs.category] && target[inputs.category] instanceof Array ? target : array(inputs.ancestors).last() : null
+                                            if (adjustedTarget) adjustedTarget[inputs.category] = [].concat(dragndropToConsumableArray(adjustedTarget[inputs.category]), dragndropToConsumableArray(inputs.selection));else updatedModel = [].concat(dragndropToConsumableArray(updatedModel), dragndropToConsumableArray(inputs.selection))
+                                            cb(updatedModel)
+                                            inputs.selection[0].parent_id = targetID
+                                            axios.post(self.saveRoute, {keepass: inputs.selection[0]}).then(res => {
+                                                if (res.data.keepass) self.$notify({title: 'Success', text: 'The folder has been moved !', type: 'success'})
+                                            }).finally(() => self.$modal.hide('dialog'))
+                                        }
+                                    },
+                                    {title: '', default: true, handler: () => {}},
+                                    {
+                                        title: 'Cancel',
+                                        handler: () => {
+                                            cb(JSON.parse(bak))
+                                            self.$modal.hide('dialog')
+                                        }
+                                    }
+                                ]
                             })
                         }
                     }

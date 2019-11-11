@@ -47,6 +47,7 @@ class FavoriteRepository implements FavoriteRepositoryInterface
             })
             ->get();
         $favorites->each(function ($item) {
+            $item->keepass->fullpath = $item->keepass->fullpath;
             $item->keepass->password = $item->keepass->password ? decrypt($item->keepass->password) : null;
         });
 

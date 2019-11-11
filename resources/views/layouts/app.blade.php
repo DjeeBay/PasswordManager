@@ -29,6 +29,7 @@
 @include('includes.header')
 <div id="app" class="app-body">
     <notifications></notifications>
+    <v-dialog></v-dialog>
     @include('includes.sidebar')
     <main class="main">
         @yield('breadcrumb')
@@ -63,9 +64,9 @@
         </div>
     </main>
 </div>
-<script src="{{ asset('js/app.js') }}"></script>
+<script src="{{mix('/js/app.js')}}"></script>
 @yield('scripts')
-<script src="{{asset('js/formValidation.js')}}"></script>
-<script src="{{asset('js/DragDropTouch.js')}}"></script>
+<script src="{{mix('/js/formValidation.js')}}"></script>
+<script src="{{mix('/js/DragDropTouch.js')}}"></script>
 </body>
 </html>
