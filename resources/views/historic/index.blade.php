@@ -50,7 +50,10 @@
                     <tbody>
                     @foreach ($keepasses as $keepass)
                         <tr>
-                            <td>{{$keepass->title}}</td>
+                            <td>
+                                {{$keepass->title}}
+                                <div><small><em>({{$keepass->fullpath}})</em></small></div>
+                            </td>
                             <td>{{$keepass->category->name}}</td>
                             <td>{{$keepass->created_at}}</td>
                             <td>{{optional(App\Models\User::withTrashed()->where('id', '=', $keepass->created_by)->first())->name}}</td>
