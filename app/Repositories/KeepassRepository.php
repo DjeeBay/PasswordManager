@@ -90,29 +90,32 @@ class KeepassRepository implements KeepassRepositoryInterface
 
     public function getStructuredItems($category_id)
     {
-        $items = $this->model->where('category_id', '=', $category_id)
-            ->orderBy('title')
-            ->get();
 
-        $rootFolders = $items->where('is_folder', 1)
-        ->where ('parent_id', null)
-        ->values()->toArray();
+        $rootFolders = Keepass::where('category_id', '=', $category_id)->where('is_folder', 1)
+        ->where('parent_id', null)->get()->toArray();
 
-        return $this->setStructureRecusively($items->toArray(), $rootFolders);
+        //TODO using it and splice the collection shows a slightly better performance but needs to find a correct way to splice...
+//        $allItems = DB::table('keepasses')
+//            ->where('category_id', '=', $category_id)
+//            ->whereNotNull('parent_id')
+//            ->get();
+
+
+        return $this->setStructureRecusively([], $rootFolders);
     }
 
-    private function setStructureRecusively(array $allItems, array &$folders)
+    private function setStructureRecusively($allItems, array &$folders)
     {
+        $foldersIDS = array_column($folders, 'id');
+        $allItems = DB::table('keepasses')->whereIn('parent_id', $foldersIDS)->get();
         foreach ($folders as &$folder) {
             $folder = (array) $folder;
             $children = [];
             foreach ($allItems as $item) {
-                if ($item['parent_id'] === $folder['id']) {
+                if ($item->parent_id === $folder['id']) {
+                    $item->password = $item->password ? decrypt($item->password) : null;
                     array_push($children, $item);
                 }
-            }
-            foreach ($children as &$child) {
-                $child['password'] = $child['password'] ? decrypt($child['password']) : null;
             }
             $folder['children'] = $children;
             $this->setStructureRecusively($allItems, $folder['children']);
