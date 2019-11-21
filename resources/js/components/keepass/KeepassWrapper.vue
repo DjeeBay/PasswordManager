@@ -27,6 +27,7 @@
                     :transition="transition"
                     :search="search"
                     :sort="sortTreeView"
+                    :strategies="strategies"
                     :labels="{'search.placeholder': 'Search (min. 3 char.)'}"
                 ></TreeView>
             </div>
@@ -481,6 +482,11 @@
                 },
                 showSelection: false,
                 showTree: true,
+                strategies: {
+                    selection: ['single'],
+                    click: ['select', 'toggle-fold', 'unfold-on-selection'],
+                    fold: ['opener-control', 'no-child-selection']
+                },
                 transition: {
                     attrs: { appear: true },
                     props: { name: 'TreeViewTransition' }
