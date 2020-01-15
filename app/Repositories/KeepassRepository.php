@@ -107,7 +107,7 @@ class KeepassRepository implements KeepassRepositoryInterface
     private function setStructureRecusively($allItems, array &$folders)
     {
         $foldersIDS = array_column($folders, 'id');
-        $allItems = DB::table('keepasses')->whereIn('parent_id', $foldersIDS)->get();
+        $allItems = DB::table('keepasses')->whereNull(['deleted_at', 'deleted_by'])->whereIn('parent_id', $foldersIDS)->get();
         foreach ($folders as &$folder) {
             $folder = (array) $folder;
             $children = [];
