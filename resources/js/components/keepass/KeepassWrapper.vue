@@ -332,7 +332,7 @@
                         keepass: keepass,
                         saveRoute: this.saveRoute,
                     }
-                    this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', classes: 'v--modal overflowAuto modalMaxHeight'})
+                    this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', clickToClose: false, classes: 'v--modal overflowAuto modalMaxHeight'})
                 }
             },
             pasteEntries() {

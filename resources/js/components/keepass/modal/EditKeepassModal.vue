@@ -3,6 +3,7 @@
         <div class="card-header bg-primary">
             <img v-if="keepassComputed.icon_id && keepassComputed.icon" :src="'/storage/'+keepassComputed.icon.path" :alt="keepassComputed.icon.filename" class="mr-1 float-left" height="20" width="20">
             {{keepass.id ? 'Edit' : 'New'}} {{keepass.title}}
+            <span v-on:click="$emit('close')" class="float-right handHover"><i class="cui-x ml-3"></i></span>
             <button v-popover:entryIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cui-smile"></i></button>
             {{keepass.icon_id}}
             <icons-popover @icon-changed="updateIcon" :icons="icons" :keepass="keepass" :popover-name="'entryIcon'" :save-route="saveRoute"></icons-popover>
