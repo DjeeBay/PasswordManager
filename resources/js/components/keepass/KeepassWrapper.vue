@@ -4,6 +4,9 @@
             <div class="floatLeftBtn">
                 <button v-on:click="showTree = !showTree" type="button" class="btn btn-dark rounded border-white"><i :class="[showTree ? 'cui-minus' : 'cui-plus']"></i></button>
             </div>
+            <div v-if="showLockDrag" class="floatLeftBtn">
+                <button v-on:click="toggleLockDrag()" type="button" class="btn btn-blue rounded border-white"><i :class="[draggable && droppable ? 'cui-lock-unlocked' : 'cui-lock-locked']"></i></button>
+            </div>
             <div>
                 <button v-on:click="openAddFolderModal()" type="button" class="btn btn-primary rounded"><i class="cui-plus"></i> <i class="cui-folder"></i></button>
             </div>
@@ -169,8 +172,8 @@
             dragndropselection(model, cb) {
                 let self = this
                 return {
-                    draggable: true,
-                    droppable: true,
+                    draggable: self.draggable,
+                    droppable: self.droppable,
                     drag: function drag(item, event, inputs) {
                         event.dataTransfer && event.dataTransfer.setData("application/json", JSON.stringify(inputs.selection));
                     },
@@ -426,6 +429,10 @@
                     return 1
                 }
             },
+            toggleLockDrag() {
+                this.draggable = !this.draggable
+                this.droppable = !this.droppable
+            },
             update(keepass, isNew) {
                 if (isNew) {
                     this.selection[0].children.push(keepass)
@@ -438,9 +445,18 @@
                 }
 
                 this.sortChildrenByTitle()
+            },
+            windowSizeDetector(e) {
+                if (window.innerWidth < 768) {
+                    this.draggable = false
+                    this.droppable = false
+                    this.showLockDrag = true
+                }
             }
         },
         mounted() {
+            this.windowSizeDetector()
+            window.addEventListener('resize', this.windowSizeDetector)
             EventBus.$on('keepass-search', this.hideEmptyItems)
             EventBus.$on('keepass-saved', (keepass, isNew) => this.update(keepass, isNew))
             EventBus.$on('keepass-deleted', keepass => this.delete(keepass))
@@ -472,6 +488,8 @@
         },
         data() {
             return {
+                draggable: true,
+                droppable: true,
                 entriesSelected: [],
                 icons: [],
                 model: [],
@@ -480,6 +498,7 @@
                     this.selection = newSelection
                     this.manageFolderIcons()
                 },
+                showLockDrag: false,
                 showSelection: false,
                 showTree: true,
                 strategies: {
