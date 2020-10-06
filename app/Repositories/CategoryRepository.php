@@ -29,6 +29,7 @@ class CategoryRepository implements CategoryRepositoryInterface
             $this->model = $this->model->newInstance();
             $this->model->name = Arr::get($attributes, 'name');
             $this->model->description = Arr::get($attributes, 'description');
+            $this->model->restricted = Arr::get($attributes, 'restricted', 0);
             $this->model->save();
             $this->saveUsersCategory($this->model);
 
@@ -45,7 +46,8 @@ class CategoryRepository implements CategoryRepositoryInterface
         DB::transaction(function () use (&$entity, $attributes) {
             $entity->update([
                 'name' => Arr::get($attributes, 'name'),
-                'description' => Arr::get($attributes, 'description')
+                'description' => Arr::get($attributes, 'description'),
+                'restricted' => Arr::get($attributes, 'restricted', 0)
             ]);
 
             $this->syncUsers($entity, Arr::get($attributes, 'users') ?? []);
