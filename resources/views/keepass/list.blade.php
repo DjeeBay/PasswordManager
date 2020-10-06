@@ -21,6 +21,7 @@
                 <div class="col-md-12">
                     <keepass-wrapper
                         add-favorites-route="{{route('favorite.add-multiple')}}"
+                        :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS', 5) >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
                         :category-id="{{$category->id}}"
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'

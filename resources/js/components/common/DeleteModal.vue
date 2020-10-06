@@ -11,7 +11,7 @@
                 <button v-on:click="close()" type="button" class="btn btn-secondary rounded">Cancel</button>
             </div>
             <div class="progress bg-dark mt-2">
-                <div class="progress-bar bg-warning" role="progressbar" :style="'width:'+Math.round(counter / 5)+'%'" :aria-valuenow="counter / 5" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar bg-warning" role="progressbar" :style="'width:'+percentage+'%'" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
     </div>
@@ -32,6 +32,11 @@
                 type: String,
                 required: true
             },
+            confirmDelayInSeconds: {
+                type: Number,
+                required: false,
+                default: 5
+            },
             xhrData: {
                 type: Object,
                 required: false
@@ -42,15 +47,18 @@
                 clearInterval(this.interval)
                 this.interval = false
                 this.counter = 0
+                this.percentage = 0
             },
             close() {
                 this.$emit('close')
             },
             submit(e) {
                 if (!this.interval) {
+                    let delay = this.deleteDelayInSeconds * 100
                     this.interval = setInterval(() => {
                         this.counter++
-                        if (this.counter >= 500) {
+                        this.percentage = Math.round(this.counter / this.deleteDelayInSeconds)
+                        if (this.counter >= delay) {
                             this.cancelSubmit()
                             axios.delete(this.route, this.xhrData).then(res => {
                                 EventBus.$emit('data-deleted', res, this.xhrData)
@@ -64,10 +72,15 @@
                 }
             }
         },
+        mounted() {
+            this.deleteDelayInSeconds = this.confirmDelayInSeconds >= 1 ? this.confirmDelayInSeconds : 5
+        },
         data() {
             return {
                 counter: 0,
-                interval: false
+                deleteDelayInSeconds: 5,
+                interval: false,
+                percentage: 0,
             }
         }
     }

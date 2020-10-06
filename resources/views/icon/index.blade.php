@@ -65,7 +65,9 @@
                                     <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
                                 </a>
                                 @if ($icon->is_deletable)
-                                    <delete-button route="{{route('icon.destroy', $icon)}}"></delete-button>
+                                    <delete-button
+                                        :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS', 5) >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
+                                        route="{{route('icon.destroy', $icon)}}"></delete-button>
                                 @endif
                             </td>
                         </tr>
