@@ -11,5 +11,5 @@ class Category extends Model
     use SoftDeletes,
         Userstamps;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'description', 'restricted'];
 }

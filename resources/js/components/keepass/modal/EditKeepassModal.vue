@@ -52,7 +52,7 @@
             <div>
                 <button v-if="keepass.id" @mousedown="submit" @mouseup="cancelSubmit" @mouseleave="cancelSubmit" @touchstart="submit" @touchend="cancelSubmit" @touchcancel="cancelSubmit" type="button" class="btn btn-danger">Delete</button>
                 <button v-on:click="save()" type="button" class="btn btn-primary rounded ml-2" :class="[keepass.id ? 'float-right' : '']">Save</button>
-                <button v-on:click="close()" type="button" class="btn btn-secondary rounded" :class="[keepass.id ? 'float-right' : '']">Cancel</button>
+                <button v-on:click="close()" type="button" class="btn btn-secondary rounded d-lg-none" :class="[keepass.id ? 'float-right' : '']">Cancel</button>
             </div>
             <div v-if="keepass.id" class="progress bg-dark mt-2">
                 <div class="progress-bar bg-warning" role="progressbar" :style="'width:'+percentage+'%'" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100"></div>
