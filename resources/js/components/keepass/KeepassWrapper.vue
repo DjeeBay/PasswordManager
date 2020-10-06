@@ -123,6 +123,11 @@
                 type: Number,
                 required: true
             },
+            confirmDelayInSeconds: {
+                type: Number,
+                required: false,
+                default: 5
+            },
             createMultipleRoute: {
                 type: String,
                 required: true
@@ -322,6 +327,7 @@
                 if (this.selection && this.selection.length) {
                     this.$modal.show(DeleteModal, {
                         bodyText: 'It will delete the folder '+this.selection[0].title+' and all its children.',
+                        confirmDelayInSeconds: this.confirmDelayInSeconds,
                         xhrData: {keepass: this.selection[0]},
                         route: '/keepass/'+this.categoryId+'/delete/'+this.selection[0].id
                     }, {adaptive: true})
@@ -330,6 +336,7 @@
             openEditModal(keepass) {
                 if (keepass && keepass.parent_id) {
                     let props = {
+                        confirmDelayInSeconds: this.confirmDelayInSeconds,
                         deleteRoute: keepass.id ? '/keepass/'+this.categoryId+'/delete/'+keepass.id : '',
                         icons: this.icons,
                         keepass: keepass,

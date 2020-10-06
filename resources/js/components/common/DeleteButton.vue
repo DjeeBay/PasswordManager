@@ -8,6 +8,11 @@
     export default {
         name: 'DeleteButton',
         props: {
+            confirmDelayInSeconds: {
+                type: Number,
+                required: false,
+                default: 5
+            },
             route: {
                 type: String,
                 required: true
@@ -15,7 +20,7 @@
         },
         methods: {
             openDeleteModal() {
-                this.$modal.show(DeleteModal, {route: this.route}, {adaptive: true})
+                this.$modal.show(DeleteModal, {confirmDelayInSeconds: this.confirmDelayInSeconds, route: this.route}, {adaptive: true})
             }
         }
     }
