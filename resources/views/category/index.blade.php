@@ -44,7 +44,9 @@
                                     </a>
                                 @endif
                                 @if ((Auth::user()->is_admin || (Auth::user()->can('delete category')) && Auth::user()->categories->where('id', $category->id)->first()))
-                                    <delete-button route="{{route('category.destroy', $category)}}"></delete-button>
+                                    <delete-button
+                                        :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS', 5) >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
+                                        route="{{route('category.destroy', $category)}}"></delete-button>
                                 @endif
                             </td>
                         </tr>

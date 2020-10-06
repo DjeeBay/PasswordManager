@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Keepass\CreateMultipleKeepassesRequest;
 use App\Http\Requests\Keepass\DeleteKeepassRequest;
+use App\Http\Requests\Keepass\ExportKeepassDatabaseRequest;
 use App\Http\Requests\Keepass\GetKeepassRequest;
 use App\Http\Requests\Keepass\ImportKeepassRequest;
 use App\Http\Requests\Keepass\SaveKeepassRequest;
@@ -149,5 +150,53 @@ class KeepassController extends Controller
         }
 
         return redirect()->route('home')->withSuccess('XML successfully imported !');
+    }
+
+    public function exportDatabase(ExportKeepassDatabaseRequest $request)
+    {
+        $keepasses = Keepass::all();
+        $columns = [
+            'ID',
+            'title',
+            'Category ID',
+            'Is Folder',
+            'Parent ID',
+            'Login',
+            'Password',
+            'URL',
+            'Notes',
+            'Icon ID',
+        ];
+
+        $callback = function() use ($keepasses, $columns)
+        {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach($keepasses as $keepass) {
+                fputcsv($file, [
+                    $keepass->id,
+                    $keepass->title,
+                    $keepass->category_id,
+                    $keepass->is_folder,
+                    $keepass->parent_id,
+                    $keepass->login,
+                    $keepass->password,
+                    $keepass->url,
+                    $keepass->notes,
+                    $keepass->icon_id,
+                ]);
+            }
+            fclose($file);
+        };
+        $headers = [
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=export_keepasses.csv',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        return response()->stream($callback, 200, $headers);
     }
 }

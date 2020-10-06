@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/keepass/{category_id}/save', 'KeepassController@save')->name('keepass.save');
     Route::post('/keepass/{category_id}/create_multiple', 'KeepassController@createMultiple')->name('keepass.create-multiple');
     Route::post('/keepass/import', 'KeepassController@import')->name('keepass.import');
+    Route::get('/keepass/export/database', 'KeepassController@exportDatabase')->name('keepass.export_database');
 
     Route::get('/historic/index', 'HistoricController@index')->name('historic.index');
     Route::get('/historic/restore/{id}', 'HistoricController@restore')->name('historic.restore');

@@ -37,6 +37,19 @@
                 </div>
             </div>
 
+            @if (Auth::user()->is_admin)
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <div>{{html()->label('Restricted ? (only admins can choose which users can access)')}}</div>
+                            {{html()->label()->class('switch switch-primary')->html(
+                                html()->checkbox('restricted', old('restricted'))->class('switch-input').'<span class="switch-slider"></span>')}}
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <hr>
             <div id="usersSelection" class="row">
                 <div class="col-6">

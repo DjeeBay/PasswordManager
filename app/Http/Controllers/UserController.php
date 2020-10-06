@@ -40,7 +40,7 @@ class UserController extends Controller
     {
         if (Auth::user()->is_admin || Auth::user()->can('create user')) {
             return view('user.form')
-                ->withCategories(Category::all());
+                ->withCategories(Auth::user()->is_admin ? Category::all() : Category::where('restricted', '=', 0)->get());
         }
 
         return redirect()->route('home');
@@ -88,7 +88,7 @@ class UserController extends Controller
         if (Auth::user()->is_admin || Auth::user()->can('edit user') || Auth::user()->id === intval($id)) {
             return view('user.form')
                 ->withUser(User::find($id))
-                ->withCategories(Category::all());
+                ->withCategories(Auth::user()->is_admin ? Category::all() : Category::where('restricted', '=', 0)->get());
         }
 
         return redirect()->route('home');

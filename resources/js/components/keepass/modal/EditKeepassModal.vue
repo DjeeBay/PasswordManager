@@ -52,10 +52,10 @@
             <div>
                 <button v-if="keepass.id" @mousedown="submit" @mouseup="cancelSubmit" @mouseleave="cancelSubmit" @touchstart="submit" @touchend="cancelSubmit" @touchcancel="cancelSubmit" type="button" class="btn btn-danger">Delete</button>
                 <button v-on:click="save()" type="button" class="btn btn-primary rounded ml-2" :class="[keepass.id ? 'float-right' : '']">Save</button>
-                <button v-on:click="close()" type="button" class="btn btn-secondary rounded" :class="[keepass.id ? 'float-right' : '']">Cancel</button>
+                <button v-on:click="close()" type="button" class="btn btn-secondary rounded d-lg-none" :class="[keepass.id ? 'float-right' : '']">Cancel</button>
             </div>
             <div v-if="keepass.id" class="progress bg-dark mt-2">
-                <div class="progress-bar bg-warning" role="progressbar" :style="'width:'+Math.round(counter / 5)+'%'" :aria-valuenow="counter / 5" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar bg-warning" role="progressbar" :style="'width:'+percentage+'%'" :aria-valuenow="percentage" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
     </div>
@@ -67,6 +67,11 @@
     export default {
         name: 'EditKeepassModal',
         props: {
+            confirmDelayInSeconds: {
+                type: Number,
+                required: false,
+                default: 5
+            },
             deleteRoute: {
                 type: String,
                 required: true
@@ -90,6 +95,7 @@
                 clearInterval(this.interval)
                 this.interval = false
                 this.counter = 0
+                this.percentage = 0
             },
             close() {
                 this.$emit('close')
@@ -119,9 +125,11 @@
             },
             submit(e) {
                 if (!this.interval) {
+                    let delay = this.deleteDelayInSeconds * 100
                     this.interval = setInterval(() => {
                         this.counter++
-                        if (this.counter >= 500) {
+                        this.percentage = Math.round(this.counter / this.deleteDelayInSeconds)
+                        if (this.counter >= delay) {
                             this.cancelSubmit()
                             axios.delete(this.deleteRoute).then(res => {
                                 if (res.data) {
@@ -141,6 +149,7 @@
             }
         },
         mounted() {
+            this.deleteDelayInSeconds = this.confirmDelayInSeconds >= 1 ? this.confirmDelayInSeconds : 5
             this.keepassComputed = JSON.parse(JSON.stringify(this.keepass))
             if (!this.keepass.id) {
                 this.keepassComputed.password = null
@@ -150,9 +159,11 @@
         data() {
             return {
                 counter: 0,
+                deleteDelayInSeconds: 5,
                 interval: false,
                 keepassComputed: {},
                 passwordLength: 10,
+                percentage: 0,
                 showPassword: false
             }
         }

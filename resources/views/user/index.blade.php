@@ -46,7 +46,9 @@
                                     </a>
                                 @endif
                                 @if ((Auth::user()->is_admin || Auth::user()->can('delete user')) && Auth::user()->id !== $user->id)
-                                    <delete-button route="{{route('user.destroy', $user)}}"></delete-button>
+                                    <delete-button
+                                        :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS', 5) >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
+                                        route="{{route('user.destroy', $user)}}"></delete-button>
                                 @endif
                             </td>
                         </tr>
