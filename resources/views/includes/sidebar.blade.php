@@ -3,7 +3,7 @@
         <ul class="nav">
             <li class="nav-title">Menu</li>
             @php
-                $categories = Auth::user()->is_admin ? App\Models\Category::all()->sortBy('name') : Auth::user()->categories->sortBy('name');
+                $categories = \Illuminate\Support\Facades\Auth::user()->is_admin ? App\Models\Category::all()->sortBy('name') : \Illuminate\Support\Facades\Auth::user()->categories->sortBy('name');
                 $colors = [
                     'text-blue',
                     'text-warning',
@@ -35,7 +35,7 @@
                     <i class="nav-icon cui-star text-warning"></i> Favorites
                 </a>
             </li>
-            @if (Auth::user()->is_admin || Auth::user()->can('read historic'))
+            @if (\Illuminate\Support\Facades\Auth::user()->is_admin || \Illuminate\Support\Facades\Auth::user()->can('read historic'))
                 <li class="nav-item">
                     <a class="nav-link" href="{{route('historic.index')}}">
                         <i class="nav-icon cui-history text-info"></i> Historic
@@ -58,17 +58,24 @@
                             <i class="nav-icon cui-people"></i> Users
                         </a>
                     </li>
-                    @if (Auth::user()->is_admin || Auth::user()->can('create keepass') || Auth::user()->can('edit keepass'))
+                    @if (\Illuminate\Support\Facades\Auth::user()->is_admin || \Illuminate\Support\Facades\Auth::user()->can('create keepass') || \Illuminate\Support\Facades\Auth::user()->can('edit keepass'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('icon.index')}}">
                                 <i class="nav-icon cui-smile"></i> Icons
                             </a>
                         </li>
                     @endif
-                    @if (Auth::user()->is_admin || Auth::user()->can('import keepass'))
+                    @if (\Illuminate\Support\Facades\Auth::user()->is_admin || \Illuminate\Support\Facades\Auth::user()->can('import keepass'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('keepass.get_import')}}">
                                 <i class="nav-icon cui-cloud-upload"></i> Import
+                            </a>
+                        </li>
+                    @endif
+                    @if (\Illuminate\Support\Facades\Auth::user()->is_admin)
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('keepass.export_database')}}">
+                                <i class="nav-icon cui-cloud-download"></i> Export Database
                             </a>
                         </li>
                     @endif
