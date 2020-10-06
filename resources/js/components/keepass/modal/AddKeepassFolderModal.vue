@@ -20,7 +20,7 @@
         <div class="card-footer text-right">
             <div>
                 <button v-on:click="save()" type="button" class="btn btn-primary rounded ml-2">Save</button>
-                <button v-on:click="close()" type="button" class="btn btn-secondary rounded">Cancel</button>
+                <button v-on:click="close()" type="button" class="btn btn-secondary rounded d-lg-none">Cancel</button>
             </div>
         </div>
     </div>
