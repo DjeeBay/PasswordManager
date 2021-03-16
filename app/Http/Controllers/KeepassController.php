@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Keepass\CreateMultipleKeepassesRequest;
 use App\Http\Requests\Keepass\DeleteKeepassRequest;
 use App\Http\Requests\Keepass\ExportKeepassDatabaseRequest;
+use App\Http\Requests\Keepass\GetKeepassEntryRequest;
 use App\Http\Requests\Keepass\GetKeepassRequest;
 use App\Http\Requests\Keepass\ImportKeepassRequest;
 use App\Http\Requests\Keepass\SaveKeepassRequest;
@@ -150,6 +151,15 @@ class KeepassController extends Controller
         }
 
         return redirect()->route('home')->withSuccess('XML successfully imported !');
+    }
+
+    public function getEntry(GetKeepassEntryRequest $request, $id)
+    {
+        $keepass = Keepass::findOrFail($id);
+
+        return view('keepass.list')
+            ->withCategory(Category::findOrFail($keepass->category_id))
+            ->withItems($this->repository->getStructuredEntryItems($keepass));
     }
 
     public function exportDatabase(ExportKeepassDatabaseRequest $request)

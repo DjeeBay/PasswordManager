@@ -15,13 +15,12 @@
         <div class="card-header bg-dark text-center font-weight-bold">
             {{$category->name}}
         </div>
-
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
                     <keepass-wrapper
                         add-favorites-route="{{route('favorite.add-multiple')}}"
-                        :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS', 5) >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
+                        :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
                         :category-id="{{$category->id}}"
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'
