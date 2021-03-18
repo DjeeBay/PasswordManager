@@ -104,6 +104,14 @@ class KeepassRepository implements KeepassRepositoryInterface
         return $this->setStructureRecusively([], $rootFolders);
     }
 
+    public function getStructuredEntryItems(Keepass $keepass)
+    {
+        $rootFolders = Keepass::where('category_id', '=', $keepass->category_id)->where('is_folder', 1)
+            ->where('id', $keepass->id)->get()->toArray();
+
+        return $this->setStructureRecusively([], $rootFolders);
+    }
+
     private function setStructureRecusively($allItems, array &$folders)
     {
         $foldersIDS = array_column($folders, 'id');
