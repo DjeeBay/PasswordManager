@@ -43,6 +43,7 @@
                 </div>
                 <div v-if="selection.length" class="mb-1">
                     <button v-if="selectionHasEntries()" type="button" v-on:click="showSelection = !showSelection" class="btn btn-sm btn-secondary">Selection<span v-if="entriesSelected.length">&nbsp;({{entriesSelected.length}})</span></button>
+                    <button type="button" v-on:click="copyFolderLink()" class="btn btn-sm btn-link"><i class="fa fa-link"></i> Copy folder link</button>
                     <button v-if="entriesSelected.length" type="button" v-on:click="entriesSelected = []" class="btn btn-sm btn-ghost-danger">Clear</button>
                     <button v-if="entriesSelected.length" type="button" v-on:click="pasteEntries" class="btn btn-sm btn-ghost-primary">Paste</button>
                     <button v-if="entriesSelected.length" type="button" v-on:click="addToFavorites" class="btn btn-sm btn-ghost-primary">Add to fav.</button>
@@ -132,6 +133,11 @@
                 type: String,
                 required: true
             },
+            entryMode: {
+                type: Boolean,
+                required: false,
+                default: false
+            },
             iconList: {
                 type: Array,
                 required: false,
@@ -163,6 +169,26 @@
                     this.selection[0].children.push(keepass)
                 } else {
                     this.model.push(keepass)
+                }
+            },
+            copyFolderLink() {
+                try {
+                    if (!this.selection.length || !this.selection[0].is_folder) return
+
+                    let splittedUrl = (window.location.href).split('/')
+                    splittedUrl.pop()
+                    if (!splittedUrl.find(s => s === 'entry')) splittedUrl.push('entry')
+                    splittedUrl.push(this.selection[0].id)
+                    let url = splittedUrl.join('/')
+                    let input = document.createElement('input')
+                    document.body.appendChild(input)
+                    input.value = url
+                    input.select()
+                    document.execCommand('copy')
+                    document.body.removeChild(input)
+                    this.$notify({text: 'URL has been copied to clipboard.'})
+                } catch (err) {
+                    this.$notify({title: 'Error', text: 'Error while copying the URL : '+err, type: 'error'})
                 }
             },
             delete(keepass) {
@@ -471,6 +497,9 @@
             EventBus.$on('data-deleted', (res, xhrData) => this.removeFolder(xhrData.keepass))
             this.model = JSON.parse(JSON.stringify(this.items))
             this.icons = JSON.parse(JSON.stringify(this.iconList))
+            if (this.entryMode) {
+                this.selection = [this.model[0]]
+            }
 
             let btnGroup = document.getElementById('btnGroup')
             let btnFloatLeft = document.getElementsByClassName('floatLeftBtn')

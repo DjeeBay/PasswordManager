@@ -24,6 +24,7 @@
                         :category-id="{{$category->id}}"
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'
+                        :entry-mode="{{\Illuminate\Support\Facades\Route::currentRouteName() === 'keepass.get_entry' ? 'true' : 'false'}}"
                         save-route="{{route('keepass.save', $category->id)}}"
                         create-multiple-route="{{route('keepass.create-multiple', $category->id)}}"
                     ></keepass-wrapper>
