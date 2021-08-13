@@ -53,7 +53,9 @@
                         <table class="table table-dark table-striped">
                             <thead>
                             <tr>
-                                <th v-if="showSelection"></th>
+                                <th v-if="showSelection">
+                                    <input type="checkbox" v-on:click="toggleAllEntriesSelection()" :checked="areAllEntriesSelected()" class="custom-checkbox">
+                                </th>
                                 <th>Title</th>
                                 <th>Login</th>
                                 <th>Password</th>
@@ -170,6 +172,13 @@
                 } else {
                     this.model.push(keepass)
                 }
+            },
+            areAllEntriesSelected() {
+                if (!this.selection || !this.selection.length) return false
+                let selectionChildren = this.selection[0].children.filter(c => !c.is_folder)
+                let selectedChildren = this.entriesSelected.filter(e => e.parent_id === this.selection[0].id)
+
+                return selectionChildren.length !== 0 && selectionChildren.length === selectedChildren.length
             },
             copyFolderLink() {
                 try {
@@ -460,6 +469,20 @@
                     return -1
                 } else {
                     return 1
+                }
+            },
+            toggleAllEntriesSelection() {
+                if (!this.selection || !this.selection.length) return
+                let selectionChildren = this.selection[0].children.filter(c => !c.is_folder)
+                let selectedChildren = this.entriesSelected.filter(e => e.parent_id === this.selection[0].id)
+                let areAllEntriesChecked = this.areAllEntriesSelected()
+                for (let i = 0; i < selectedChildren.length; i++) {
+                    this.entriesSelected.splice(this.entriesSelected.findIndex(e => e.id === selectedChildren[i].id), 1)
+                }
+                if (!areAllEntriesChecked) {
+                    for (let i = 0; i < selectionChildren.length; i++) {
+                        this.entriesSelected.push(selectionChildren[i])
+                    }
                 }
             },
             toggleLockDrag() {
