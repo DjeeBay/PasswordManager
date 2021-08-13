@@ -19,13 +19,13 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Login</label>
-                        <input type="text" v-model="keepassComputed.login" class="form-control">
+                        <input type="text" v-model="keepassComputed.login" class="form-control" autocomplete="off">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Password</label>
-                        <input :type="showPassword ? 'text' : 'password'" v-model="keepassComputed.password" class="form-control">
+                        <input :type="showPassword ? 'text' : 'password'" v-model="keepassComputed.password" class="form-control" autocomplete="new-password">
                         <div class="mt-1">
                             <button v-on:click="showPassword = !showPassword" type="button" class="btn btn-sm btn-secondary"><i :class="[showPassword ? 'cui-lock-unlocked' : 'cui-lock-locked']"></i></button>
                             <button v-on:click="generatePassword" type="button" class="btn btn-sm btn-dark">Generate ({{passwordLength}})</button>
