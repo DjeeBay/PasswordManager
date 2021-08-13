@@ -1,9 +1,11 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CategoryPermissionsSeeder extends Seeder
+class KeepassPermissionsSeeder extends Seeder
 {
     const TABLE = 'permissions';
 
@@ -15,24 +17,29 @@ class CategoryPermissionsSeeder extends Seeder
     public function run()
     {
         $alreadyExists = DB::table(self::TABLE)
-            ->where('name', '=', 'create category')
-            ->orWhere('name', '=', 'edit category')
-            ->orWhere('name', '=', 'delete category')
+            ->where('name', '=', 'create keepass')
+            ->orWhere('name', '=', 'edit keepass')
+            ->orWhere('name', '=', 'delete keepass')
+            ->orWhere('name', '=', 'import keepass')
             ->get();
 
         if (!count($alreadyExists)) {
             DB::table(self::TABLE)
                 ->insert([
                     [
-                        'name' => 'create category',
+                        'name' => 'create keepass',
                         'guard_name' => 'web'
                     ],
                     [
-                        'name' => 'edit category',
+                        'name' => 'edit keepass',
                         'guard_name' => 'web'
                     ],
                     [
-                        'name' => 'delete category',
+                        'name' => 'delete keepass',
+                        'guard_name' => 'web'
+                    ],
+                    [
+                        'name' => 'import keepass',
                         'guard_name' => 'web'
                     ]
                 ]);
