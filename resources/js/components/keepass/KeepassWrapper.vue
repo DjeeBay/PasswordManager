@@ -325,10 +325,6 @@
 
                 return path+this.selection[0].title+'/'
             },
-            getURL(url) {
-                if (!url) return url
-                return (url.startsWith('https://') || url.startsWith('http://')) ? url : 'http://'+url
-            },
             hideEmptyItems() {
                 //TODO find a better way to hide those items
                 setTimeout(() => {
