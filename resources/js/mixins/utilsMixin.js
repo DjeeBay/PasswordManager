@@ -29,5 +29,9 @@ export const utilsMixin = {
             document.body.removeChild(fakeInput)
             this.$notify({text: type+' copied !'})
         },
+        getURL(url) {
+            if (!url) return url
+            return (url.startsWith('https://') || url.startsWith('http://')) ? url : 'http://'+url
+        },
     }
 }

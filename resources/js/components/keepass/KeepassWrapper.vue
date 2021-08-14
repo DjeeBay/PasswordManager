@@ -37,7 +37,7 @@
             <div class="colTreeView" :class="[showTree ? 'col-md-9' : 'col-md-12']">
                 <div v-if="selection.length" class="form-inline mb-2 position-relative">
                     <input type="text" v-model="selection[0].title" class="w-50 form-control form-control-sm" :class="[selection[0].title ? 'is-valid' : 'is-invalid']">
-                    <button v-on:click="saveFolderTitle" type="button" class="btn btn-sm btn-primary ml-1">Save</button>
+                    <button v-on:click="saveFolderTitle" type="button" class="btn btn-sm btn-primary ml-1">Save folder name</button>
                     <button v-popover:folderIcon.bottom type="button" class="btn btn-sm btn-warning ml-1"><i class="cui-smile"></i></button>
                     <icons-popover :icons="icons" :keepass="selection[0]" :popover-name="'folderIcon'" :save-route="saveRoute"></icons-popover>
                 </div>
@@ -53,7 +53,9 @@
                         <table class="table table-dark table-striped">
                             <thead>
                             <tr>
-                                <th v-if="showSelection"></th>
+                                <th v-if="showSelection">
+                                    <input type="checkbox" v-on:click="toggleAllEntriesSelection()" :checked="areAllEntriesSelected()" class="custom-checkbox">
+                                </th>
                                 <th>Title</th>
                                 <th>Login</th>
                                 <th>Password</th>
@@ -71,9 +73,12 @@
                                         <button type="button" v-on:click="openEditModal(keepass)" class="btn btn-sm btn-blue"><img v-if="keepass.icon_id && keepass.icon" :src="'/storage/'+keepass.icon.path" :alt="keepass.icon.filename" height="16" width="16"> {{keepass.title}}</button>
                                     </td>
                                     <td v-on:click="copy(keepass.login, 'Login')" class="handHover">{{keepass.login}}</td>
-                                    <td v-on:click="copy(keepass.password, 'Password')" class="handHover"><i v-if="keepass.password">(length {{keepass.password.length}})</i></td>
                                     <td>
-                                        <a :href="keepass.url" target="_blank">{{keepass.url && keepass.url.length > 25 ? keepass.url.substr(0, 24)+'&hellip;' : keepass.url}}</a>
+                                        <span v-on:click="copy(keepass.password, 'Password')" class="handHover"><i v-if="keepass.password">(length {{keepass.password.length}})</i></span>
+                                        <span v-if="keepass.password && keepass.login" v-on:click="copy(keepass.login+':'+keepass.password, 'Login & Password')" class="handHover"><small class="text-warning">L:P</small></span>
+                                    </td>
+                                    <td>
+                                        <a :href="getURL(keepass.url)" target="_blank">{{keepass.url && keepass.url.length > 25 ? keepass.url.substr(0, 24)+'&hellip;' : keepass.url}}</a>
                                         <span v-if="keepass.url" v-on:click="copy(keepass.url, 'URL')" class="handHover"><i class="cui-copy text-warning"></i></span>
                                     </td>
                                     <td><div class="notes">{{keepass.notes}}</div></td>
@@ -170,6 +175,13 @@
                 } else {
                     this.model.push(keepass)
                 }
+            },
+            areAllEntriesSelected() {
+                if (!this.selection || !this.selection.length) return false
+                let selectionChildren = this.selection[0].children.filter(c => !c.is_folder)
+                let selectedChildren = this.entriesSelected.filter(e => e.parent_id === this.selection[0].id)
+
+                return selectionChildren.length !== 0 && selectionChildren.length === selectedChildren.length
             },
             copyFolderLink() {
                 try {
@@ -460,6 +472,20 @@
                     return -1
                 } else {
                     return 1
+                }
+            },
+            toggleAllEntriesSelection() {
+                if (!this.selection || !this.selection.length) return
+                let selectionChildren = this.selection[0].children.filter(c => !c.is_folder)
+                let selectedChildren = this.entriesSelected.filter(e => e.parent_id === this.selection[0].id)
+                let areAllEntriesChecked = this.areAllEntriesSelected()
+                for (let i = 0; i < selectedChildren.length; i++) {
+                    this.entriesSelected.splice(this.entriesSelected.findIndex(e => e.id === selectedChildren[i].id), 1)
+                }
+                if (!areAllEntriesChecked) {
+                    for (let i = 0; i < selectionChildren.length; i++) {
+                        this.entriesSelected.push(selectionChildren[i])
+                    }
                 }
             },
             toggleLockDrag() {

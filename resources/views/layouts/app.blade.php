@@ -64,6 +64,7 @@
         </div>
     </main>
 </div>
+@include('includes.footer')
 <script src="{{mix('/js/app.js')}}"></script>
 @yield('scripts')
 <script src="{{mix('/js/formValidation.js')}}"></script>

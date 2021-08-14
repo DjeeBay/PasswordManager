@@ -19,12 +19,13 @@
                 </span>
                 <span v-else-if="props.column.field === 'password'">
                     <span v-on:click="copy(props.row.password, 'Password')" class="handHover"><i v-if="props.row.password">(length {{props.row.password.length}})</i></span>
+                    <span v-if="props.row.password && props.row.login" v-on:click="copy(props.row.login+':'+props.row.password, 'Login & Password')" class="handHover"><small class="text-warning">L:P</small></span>
                 </span>
                 <span v-else-if="props.column.field === 'login'">
                     <span v-on:click="copy(props.row.login, 'Login')" class="handHover">{{props.row.login}}</span>
                 </span>
                 <div v-else-if="props.column.field === 'url'" class="text-nowrap">
-                    <a :href="props.row.url" target="_blank">{{props.row.url && props.row.url.length > 25 ? props.row.url.substr(0, 24)+'&hellip;' : props.row.url}}</a>
+                    <a :href="getURL(props.row.url)" target="_blank">{{props.row.url && props.row.url.length > 25 ? props.row.url.substr(0, 24)+'&hellip;' : props.row.url}}</a>
                     <span v-if="props.row.url" v-on:click="copy(props.row.url, 'URL')" class="handHover"><i class="cui-copy text-warning"></i></span>
                 </div>
                 <div v-else-if="props.column.field === 'notes'" class="notes">
