@@ -25,7 +25,7 @@ class CreateMultipleKeepassesRequest extends FormRequest
     public function rules()
     {
         return [
-            'keepasses' => 'array:required',
+            'keepasses' => 'array|required',
             'keepasses.*.is_folder' => 'boolean',
             'keepasses.*.login' => 'string|nullable',
             'keepasses.*.url' => 'string|nullable',
