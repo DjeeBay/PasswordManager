@@ -13,7 +13,7 @@ import Popover from 'vue-js-popover'
 import VueGoodTablePlugin from 'vue-good-table'
 import 'vue-good-table/dist/vue-good-table.css'
 
-window.Vue = require('vue');
+import Vue from 'vue'
 import Vuex from 'vuex'
 import 'es6-promise/auto'
 
