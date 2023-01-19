@@ -3,7 +3,7 @@
         <div class="card-header bg-primary">
             <img v-if="keepass.icon_id && keepass.icon" :src="'/storage/'+keepass.icon.path" :alt="keepass.icon.filename" class="mr-1 float-left" height="20" width="20">
             New folder
-            <button v-popover:newFolderIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cui-smile"></i></button>
+            <button v-popover:newFolderIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cil-smile"></i></button>
             <icons-popover @icon-changed="updateIcon" :icons="icons" :keepass="keepass" :popover-name="'newFolderIcon'" :save-route="saveRoute"></icons-popover>
         </div>
         <div class="card-body">

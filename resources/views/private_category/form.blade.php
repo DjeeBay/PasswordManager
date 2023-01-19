@@ -4,8 +4,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{route('category.index')}}">Categories</a></li>
-            <li class="breadcrumb-item active">@if (isset($category))# {{$category->id}} @else New category @endif</li>
+            <li class="breadcrumb-item"><a href="{{route('private-category.index')}}">Private categories</a></li>
+            <li class="breadcrumb-item active">@if (isset($category))# {{$category->id}} @else New private category @endif</li>
         </ol>
     </nav>
 @endsection
@@ -17,9 +17,9 @@
         </div>
 
         @if (isset($category))
-            {{html()->modelForm($category, 'PUT', route('category.update', $category->id))->class('needs-validation')->novalidate()->open()}}
+            {{html()->modelForm($category, 'PUT', route('private-category.update', $category->id))->class('needs-validation')->novalidate()->open()}}
         @else
-            {{html()->form('POST', route('category.store'))->class('needs-validation')->novalidate()->open()}}
+            {{html()->form('POST', route('private-category.store'))->class('needs-validation')->novalidate()->open()}}
         @endif
         <div class="card-body">
             <div class="row">
@@ -35,38 +35,12 @@
                         {{html()->textarea('description', old('description'))->class('form-control')->placeholder('description')}}
                     </div>
                 </div>
-            </div>
-
-            @if (Auth::user()->is_admin)
-                <hr>
-                <div class="row">
-                    <div class="col">
-                        <div class="form-group">
-                            <div>{{html()->label('Restricted ? (only admins can choose which users can access)')}}</div>
-                            {{html()->label()->class('switch switch-primary')->html(
-                                html()->checkbox('restricted', old('restricted'))->class('switch-input').'<span class="switch-slider"></span>')}}
-                        </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        {{html()->label('Color', 'color')}}
+                        <input type="color" name="color" class="form-control" value="{{old('color', isset($category) ? $category->color : null)}}">
                     </div>
                 </div>
-            @endif
-
-            <hr>
-            <div id="usersSelection" class="row">
-                <div class="col-6">
-                    <h4>Who can access ?</h4>
-                </div>
-                <div class="col-6 text-right">
-                    <button type="button" id="selectAll" class="btn btn-dark btn-sm">Toggle all</button>
-                </div>
-                @foreach ($users as $user)
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <div>{{html()->label($user->name)}}</div>
-                            {{html()->label()->class('switch switch-success')->html(
-                                html()->checkbox('users[]', old('users[]'))->value($user->id)->checked(isset($category) && $user->categories->where('id', $category->id)->first())->id('user'.$user->id)->class('switch-input').'<span class="switch-slider"></span>')}}
-                        </div>
-                    </div>
-                @endforeach
             </div>
         </div>
 
@@ -75,20 +49,4 @@
         </div>
         {{html()->closeModelForm()}}
     </div>
-@endsection
-
-@section('scripts')
-    <script type="text/javascript">
-        window.addEventListener('load', function () {
-            let button = document.getElementById('selectAll')
-            let checkboxes = document.querySelectorAll('#usersSelection input[type=checkbox]')
-            button.addEventListener('click', function (event) {
-                let isFirstChecked = checkboxes.length && checkboxes[0].checked
-                for (let i = 0; i < checkboxes.length; i++) {
-                    checkboxes[i].checked = !isFirstChecked
-                    isFirstChecked ? checkboxes[i].removeAttribute('checked') : checkboxes[i].setAttribute('checked', 'checked')
-                }
-            }, false)
-        })
-    </script>
 @endsection

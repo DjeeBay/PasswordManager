@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Favorite;
 use App\Http\Requests\Favorite\DeleteFavoritesRequest;
 use App\Http\Requests\Favorite\StoreFavoritesRequest;
+use App\Http\Requests\Keepass\StoreFavoritesPrivateRequest;
 use App\Interfaces\FavoriteRepositoryInterface;
 use App\Repositories\FavoriteRepository;
 use Illuminate\Http\Request;
@@ -12,8 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    /** @var FavoriteRepository $repository */
-    protected $repository;
+    protected FavoriteRepositoryInterface $repository;
 
     public function __construct(FavoriteRepositoryInterface $repository)
     {
@@ -28,9 +28,12 @@ class FavoriteController extends Controller
 
     public function addMultiple(StoreFavoritesRequest $request)
     {
-        $this->repository->storeMultiple($request->keepasses);
+        return $this->addMultipleKeepasses($request, false);
+    }
 
-        return response()->json(true);
+    public function addMultiplePrivate(StoreFavoritesPrivateRequest $request)
+    {
+        return $this->addMultipleKeepasses($request, true);
     }
 
     public function removeMultiple(DeleteFavoritesRequest $request)
@@ -38,6 +41,13 @@ class FavoriteController extends Controller
         Favorite::whereIn('keepass_id', $request->json('keepasses.*.id'))
             ->where('user_id', '=', Auth::user()->id)
             ->delete();
+
+        return response()->json(true);
+    }
+
+    private function addMultipleKeepasses(Request $request, bool $isPrivate)
+    {
+        $this->repository->storeMultiple($request->keepasses, $isPrivate);
 
         return response()->json(true);
     }

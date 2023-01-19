@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface PrivateCategoryInterface extends BaseRepositoryInterface
+interface PrivateCategoryRepositoryInterface extends BaseRepositoryInterface
 {
 
 }

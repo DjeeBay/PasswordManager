@@ -2,19 +2,19 @@
     <div>
         <div id="btnGroup" class="mb-2">
             <div class="floatLeftBtn">
-                <button v-on:click="showTree = !showTree" type="button" class="btn btn-dark rounded border-white"><i :class="[showTree ? 'cui-minus' : 'cui-plus']"></i></button>
+                <button v-on:click="showTree = !showTree" type="button" class="btn btn-dark rounded border-white"><i :class="[showTree ? 'cil-minus' : 'cil-plus']"></i></button>
             </div>
             <div v-if="showLockDrag" class="floatLeftBtn">
-                <button v-on:click="toggleLockDrag()" type="button" class="btn btn-blue rounded border-white"><i :class="[draggable && droppable ? 'cui-lock-unlocked' : 'cui-lock-locked']"></i></button>
+                <button v-on:click="toggleLockDrag()" type="button" class="btn btn-blue rounded border-white"><i :class="[draggable && droppable ? 'cil-lock-unlocked' : 'cil-lock-locked']"></i></button>
             </div>
             <div>
-                <button v-on:click="openAddFolderModal()" type="button" class="btn btn-primary rounded"><i class="cui-plus"></i> <i class="cui-folder"></i></button>
+                <button v-on:click="openAddFolderModal()" type="button" class="btn btn-primary rounded"><i class="cil-plus"></i> <i class="cil-folder"></i></button>
             </div>
             <div>
-                <button v-on:click="openEditModal({is_folder: 0, parent_id: selection.length ? selection[0].id : null, icon_id: null, icon: null})" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-success']" :disabled="!selection.length"><i class="cui-plus"></i> <i class="cui-file"></i></button>
+                <button v-on:click="openEditModal({is_folder: 0, parent_id: selection.length ? selection[0].id : null, icon_id: null, icon: null})" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-success']" :disabled="!selection.length"><i class="cil-plus"></i> <i class="cil-file"></i></button>
             </div>
             <div>
-                <button v-on:click="openDeleteFolderModal" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-danger']" :disabled="!selection.length"><i class="cui-minus"></i> <i class="cui-trash"></i></button>
+                <button v-on:click="openDeleteFolderModal" type="button" class="btn rounded" :class="[!selection.length ? 'btn-secondary' : 'btn-danger']" :disabled="!selection.length"><i class="cil-minus"></i> <i class="cil-trash"></i></button>
             </div>
         </div>
         <div class="row">
@@ -38,7 +38,7 @@
                 <div v-if="selection.length" class="form-inline mb-2 position-relative">
                     <input type="text" v-model="selection[0].title" class="w-50 form-control form-control-sm" :class="[selection[0].title ? 'is-valid' : 'is-invalid']">
                     <button v-on:click="saveFolderTitle" type="button" class="btn btn-sm btn-primary ml-1">Save folder name</button>
-                    <button v-popover:folderIcon.bottom type="button" class="btn btn-sm btn-warning ml-1"><i class="cui-smile"></i></button>
+                    <button v-popover:folderIcon.bottom type="button" class="btn btn-sm btn-warning ml-1"><i class="cil-smile"></i></button>
                     <icons-popover :icons="icons" :keepass="selection[0]" :popover-name="'folderIcon'" :save-route="saveRoute"></icons-popover>
                 </div>
                 <div v-if="selection.length" class="mb-1">
@@ -79,7 +79,7 @@
                                     </td>
                                     <td>
                                         <a :href="getURL(keepass.url)" target="_blank">{{keepass.url && keepass.url.length > 25 ? keepass.url.substr(0, 24)+'&hellip;' : keepass.url}}</a>
-                                        <span v-if="keepass.url" v-on:click="copy(keepass.url, 'URL')" class="handHover"><i class="cui-copy text-warning"></i></span>
+                                        <span v-if="keepass.url" v-on:click="copy(keepass.url, 'URL')" class="handHover"><i class="cil-copy text-warning"></i></span>
                                     </td>
                                     <td><div class="notes">{{keepass.notes}}</div></td>
                                 </tr>
@@ -147,6 +147,10 @@
                 type: Array,
                 required: false,
                 default: []
+            },
+            isPrivate: {
+                type: Boolean,
+                required: true
             },
             items: {
                 type: Array,
@@ -342,12 +346,12 @@
                     let itemsNotFolded = document.querySelectorAll('li.category:not(.folded)>.item a i')
                     let itemsFolded = document.querySelectorAll('li.category.folded>.item a i')
                     for (let i = 0; i < itemsNotFolded.length; i++) {
-                        itemsNotFolded[i].classList.remove('cui-folder')
-                        itemsNotFolded[i].classList.add('cui-folder-open')
+                        itemsNotFolded[i].classList.remove('cil-folder')
+                        itemsNotFolded[i].classList.add('cil-folder-open')
                     }
                     for (let i = 0; i < itemsFolded.length; i++) {
-                        itemsFolded[i].classList.remove('cui-folder-open')
-                        itemsFolded[i].classList.add('cui-folder')
+                        itemsFolded[i].classList.remove('cil-folder-open')
+                        itemsFolded[i].classList.add('cil-folder')
                     }
                 }, 50)
             },
@@ -375,7 +379,7 @@
                 if (keepass && keepass.parent_id) {
                     let props = {
                         confirmDelayInSeconds: this.confirmDelayInSeconds,
-                        deleteRoute: keepass.id ? '/keepass/'+this.categoryId+'/delete/'+keepass.id : '',
+                        deleteRoute: keepass.id ? '/keepass/'+(this.isPrivate ? 'private/' : '')+this.categoryId+'/delete/'+keepass.id : '',
                         icons: this.icons,
                         keepass: keepass,
                         saveRoute: this.saveRoute,
@@ -577,7 +581,7 @@
                         if (item.icon_id && item.icon) {
                             return <a><img src={'/storage/'+item.icon.path} alt={item.icon.filename} height="14" width="14"></img> {item.title}</a>
                         }
-                        return <a><i class="cui-folder text-primary"></i> {item.title}</a>
+                        return <a><i class="cil-folder text-primary"></i> {item.title}</a>
                     }
                     return null
                 },
