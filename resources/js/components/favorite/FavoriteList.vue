@@ -1,5 +1,10 @@
 <template>
     <div>
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="switch" @input="toggleShowPrivateEntries">
+            <label class="custom-control-label" for="switch">Private entries</label>
+        </div>
+        <hr>
         <vue-good-table
             ref="favs-table"
             :columns="columns"
@@ -26,7 +31,7 @@
                 </span>
                 <div v-else-if="props.column.field === 'url'" class="text-nowrap">
                     <a :href="getURL(props.row.url)" target="_blank">{{props.row.url && props.row.url.length > 25 ? props.row.url.substr(0, 24)+'&hellip;' : props.row.url}}</a>
-                    <span v-if="props.row.url" v-on:click="copy(props.row.url, 'URL')" class="handHover"><i class="cui-copy text-warning"></i></span>
+                    <span v-if="props.row.url" v-on:click="copy(props.row.url, 'URL')" class="handHover"><i class="cil-copy text-warning"></i></span>
                 </div>
                 <div v-else-if="props.column.field === 'notes'" class="notes">
                     {{props.row.notes}}
@@ -69,11 +74,20 @@
                         }
                     })
                 }
+            },
+            toggleShowPrivateEntries() {
+                this.showPrivateEntries = !this.showPrivateEntries
+                this.favorites = []
+                const favs = this.favoriteList.filter(f => this.showPrivateEntries ? f.keepass.private_category_id : f.keepass.category_id)
+                for (let i = 0; i < favs.length; i++) {
+                    this.favorites.push(JSON.parse(JSON.stringify(favs[i].keepass)))
+                }
             }
         },
         mounted() {
-            for (let i = 0; i < this.favoriteList.length; i++) {
-                this.favorites.push(JSON.parse(JSON.stringify(this.favoriteList[i].keepass)))
+            const favs = this.favoriteList.filter(f => f.keepass.category_id)
+            for (let i = 0; i < favs.length; i++) {
+                this.favorites.push(JSON.parse(JSON.stringify(favs[i].keepass)))
             }
         },
         data() {
@@ -112,7 +126,8 @@
                         },
                     },
                 ],
-                favorites: []
+                favorites: [],
+                showPrivateEntries: false
             }
         }
     }

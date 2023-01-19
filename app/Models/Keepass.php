@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Wildside\Userstamps\Userstamps;
@@ -62,5 +63,17 @@ class Keepass extends Model
         }
 
         return implode('/', array_reverse($parents));
+    }
+
+    public function scopeNotPrivate(Builder $query)
+    {
+        $query->whereNotNull('category_id')
+            ->whereNull('private_category_id');
+    }
+
+    public function scopePrivate(Builder $query)
+    {
+        $query->whereNotNull('private_category_id')
+            ->whereNull('category_id');
     }
 }

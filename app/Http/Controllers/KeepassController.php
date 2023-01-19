@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Keepass\CreateMultipleKeepassesRequest;
+use App\Http\Requests\Keepass\CreateMultiplePrivateKeepassesRequest;
 use App\Http\Requests\Keepass\DeleteKeepassRequest;
+use App\Http\Requests\Keepass\DeletePrivateKeepassRequest;
 use App\Http\Requests\Keepass\ExportKeepassDatabaseRequest;
 use App\Http\Requests\Keepass\GetKeepassEntryRequest;
 use App\Http\Requests\Keepass\GetKeepassRequest;
+use App\Http\Requests\Keepass\GetPrivateKeepassEntryRequest;
+use App\Http\Requests\Keepass\GetPrivateKeepassRequest;
 use App\Http\Requests\Keepass\ImportKeepassRequest;
 use App\Http\Requests\Keepass\SaveKeepassRequest;
+use App\Http\Requests\Keepass\SavePrivateKeepassRequest;
 use App\Interfaces\KeepassRepositoryInterface;
 use App\Models\Category;
 use App\Models\Keepass;
+use App\Models\PrivateCategory;
 use App\Repositories\KeepassRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,9 +36,12 @@ class KeepassController extends Controller
 
     public function get(GetKeepassRequest $request, $category_id)
     {
-        return view('keepass.list')
-            ->withCategory(Category::findOrFail($category_id))
-            ->withItems($this->repository->getStructuredItems($category_id));
+        return $this->getKeepass($category_id, false);
+    }
+
+    public function getPrivate(GetPrivateKeepassRequest $request, $category_id)
+    {
+        return $this->getKeepass($category_id, true);
     }
 
     /**
@@ -114,24 +123,32 @@ class KeepassController extends Controller
 
     public function save(SaveKeepassRequest $request, $category_id)
     {
-        $attributes = $request->keepass;
-        $attributes['category_id'] = $category_id;
-        $keepass = !$request->has('keepass.id') || !$request->json('keepass.id') ? $this->repository->create($attributes) : $this->repository->update(Keepass::findOrFail($request->json('keepass.id')), $attributes);
-        $keepass->password = $keepass->password ? decrypt($keepass->password) : null;
+        return $this->saveKeepass($request, $category_id, false);
+    }
 
-        return response()->json(['keepass' => $keepass]);
+    public function savePrivate(SavePrivateKeepassRequest $request, $category_id)
+    {
+        return $this->saveKeepass($request, $category_id, true);
     }
 
     public function createMultiple(CreateMultipleKeepassesRequest $request, $category_id)
     {
-        return response()->json(['keepasses' => $this->repository->createMultiple($request->keepasses, $category_id)]);
+        return response()->json(['keepasses' => $this->repository->createMultiple($request->keepasses, $category_id, false)]);
+    }
+
+    public function createMultiplePrivate(CreateMultiplePrivateKeepassesRequest $request, $category_id)
+    {
+        return response()->json(['keepasses' => $this->repository->createMultiple($request->keepasses, $category_id, true)]);
     }
 
     public function delete(DeleteKeepassRequest $request, $category_id, $id)
     {
-        $deleted = $this->repository->delete(Keepass::findOrFail($id));
+        return $this->deleteKeepass($id);
+    }
 
-        return response()->json($deleted);
+    public function deletePrivate(DeletePrivateKeepassRequest $request, $category_id, $id)
+    {
+        return $this->deleteKeepass($id);
     }
 
     public function getImport()
@@ -155,16 +172,17 @@ class KeepassController extends Controller
 
     public function getEntry(GetKeepassEntryRequest $request, $id)
     {
-        $keepass = Keepass::findOrFail($id);
+        return $this->getKeepassEntry($id, false);
+    }
 
-        return view('keepass.list')
-            ->withCategory(Category::findOrFail($keepass->category_id))
-            ->withItems($this->repository->getStructuredEntryItems($keepass));
+    public function getPrivateEntry(GetPrivateKeepassEntryRequest $request, $id)
+    {
+        return $this->getKeepassEntry($id, true);
     }
 
     public function exportDatabase(ExportKeepassDatabaseRequest $request)
     {
-        $keepasses = Keepass::all();
+        $keepasses = Keepass::notPrivate()->get();
         $columns = [
             'ID',
             'title',
@@ -208,5 +226,42 @@ class KeepassController extends Controller
         ];
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    private function deleteKeepass($id)
+    {
+        $deleted = $this->repository->delete(Keepass::findOrFail($id));
+
+        return response()->json($deleted);
+    }
+
+    private function getKeepass($category_id, bool $isPrivate)
+    {
+        $model = $isPrivate ? PrivateCategory::query() : Category::query();
+        return view('keepass.list')
+            ->withCategory($model->findOrFail($category_id))
+            ->withItems($this->repository->getStructuredItems($category_id, $isPrivate))
+            ->withIsPrivate($isPrivate);
+    }
+
+    private function getKeepassEntry($id, bool $isPrivate)
+    {
+        $keepass = Keepass::findOrFail($id);
+
+        return view('keepass.list')
+            ->withCategory(!$isPrivate ? Category::findOrFail($keepass->category_id) : PrivateCategory::findOrFail($keepass->private_category_id))
+            ->withItems($this->repository->getStructuredEntryItems($keepass))
+            ->withIsPrivate($isPrivate);
+    }
+
+    private function saveKeepass(Request $request, $category_id, bool $isPrivate)
+    {
+        $attributes = $request->keepass;
+        $attributes[$isPrivate ? 'private_category_id' : 'category_id'] = $category_id;
+        $attributes[$isPrivate ? 'category_id' : 'private_category_id'] = null;
+        $keepass = !$request->has('keepass.id') || !$request->json('keepass.id') ? $this->repository->create($attributes) : $this->repository->update(Keepass::findOrFail($request->json('keepass.id')), $attributes);
+        $keepass->password = $keepass->password ? decrypt($keepass->password) : null;
+
+        return response()->json(['keepass' => $keepass]);
     }
 }

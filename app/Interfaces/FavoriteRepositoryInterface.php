@@ -10,5 +10,5 @@ interface FavoriteRepositoryInterface extends BaseRepositoryInterface
 {
     public function getList() : Collection;
 
-    public function storeMultiple(array $keepasses);
+    public function storeMultiple(array $keepasses, bool $isPrivate);
 }

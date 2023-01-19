@@ -15,7 +15,7 @@
             Categories list
             @if (Auth::user()->is_admin || Auth::user()->can('create category'))
                 <a href="{{route('category.create')}}">
-                    <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cui-plus"></i> Create</button>
+                    <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cil-plus"></i> Create</button>
                 </a>
             @endif
         </div>
@@ -40,7 +40,7 @@
                             <td>
                                 @if (Auth::user()->is_admin || (Auth::user()->can('edit category') && Auth::user()->categories->where('id', $category->id)->first()))
                                     <a href="{{route('category.edit', $category)}}">
-                                        <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
+                                        <button type="button" class="btn btn-warning rounded"><i class="cil-pencil"></i></button>
                                     </a>
                                 @endif
                                 @if ((Auth::user()->is_admin || (Auth::user()->can('delete category')) && Auth::user()->categories->where('id', $category->id)->first()))

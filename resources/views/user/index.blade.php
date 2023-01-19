@@ -15,7 +15,7 @@
             Users list
             @if (Auth::user()->is_admin || Auth::user()->can('create user'))
                 <a href="{{route('user.create')}}">
-                    <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cui-plus"></i> Create</button>
+                    <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cil-plus"></i> Create</button>
                 </a>
             @endif
         </div>
@@ -42,7 +42,7 @@
                             <td>
                                 @if (Auth::user()->is_admin || Auth::user()->can('edit user') || Auth::user()->id === $user->id)
                                     <a href="{{route('user.edit', $user)}}">
-                                        <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
+                                        <button type="button" class="btn btn-warning rounded"><i class="cil-pencil"></i></button>
                                     </a>
                                 @endif
                                 @if ((Auth::user()->is_admin || Auth::user()->can('delete user')) && Auth::user()->id !== $user->id)
