@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Favorite;
 use App\Interfaces\FavoriteRepositoryInterface;
 use App\Models\Category;
+use App\Models\PrivateCategory;
 use App\Models\UserCategory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -54,21 +55,21 @@ class FavoriteRepository implements FavoriteRepositoryInterface
         return $favorites;
     }
 
-    public function storeMultiple(array $keepasses)
+    public function storeMultiple(array $keepasses, bool $isPrivate)
     {
-        DB::transaction(function () use ($keepasses) {
+        DB::transaction(function () use ($keepasses, $isPrivate) {
             $userID = Auth::user()->id;
-            $userCategories = Auth::user()->is_admin ? Category::all()->pluck('id')->toArray() : UserCategory::where('user_id', '=', $userID)->pluck('category_id')->toArray();
+            $userCategories = $isPrivate ? PrivateCategory::where('owner_id', '=', Auth::user()->id)->pluck('id')->toArray() : (Auth::user()->is_admin ? Category::all()->pluck('id')->toArray() : UserCategory::where('user_id', '=', $userID)->pluck('category_id')->toArray());
             $hasRight = true;
             $favorites = [];
             foreach ($keepasses as $keepass) {
                 $keepassID = Arr::get($keepass, 'id');
-                $hasRight &= in_array(Arr::get($keepass, 'category_id'), $userCategories);
+                $hasRight &= in_array(Arr::get($keepass, $isPrivate ? 'private_category_id' : 'category_id'), $userCategories);
                 if (!Favorite::where([['keepass_id', '=', $keepassID], ['user_id', '=', $userID]])->first()) {
-                    array_push($favorites, [
+                    $favorites[] = [
                         'user_id' => $userID,
                         'keepass_id' => $keepassID,
-                    ]);
+                    ];
                 }
             }
             if ($hasRight) {

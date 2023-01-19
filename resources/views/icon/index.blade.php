@@ -14,7 +14,7 @@
         <div class="card-header bg-cyan">
             Icons list
             <a href="{{route('icon.create')}}">
-                <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cui-plus"></i> Create</button>
+                <button type="button" class="btn btn-sm btn-light rounded float-right"><i class="cil-plus"></i> Create</button>
             </a>
         </div>
 
@@ -62,7 +62,7 @@
                             </td>
                             <td>
                                 <a href="{{route('icon.edit', $icon)}}">
-                                    <button type="button" class="btn btn-warning rounded"><i class="cui-pencil"></i></button>
+                                    <button type="button" class="btn btn-warning rounded"><i class="cil-pencil"></i></button>
                                 </a>
                                 @if ($icon->is_deletable)
                                     <delete-button

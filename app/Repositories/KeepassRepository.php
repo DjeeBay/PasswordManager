@@ -30,6 +30,7 @@ class KeepassRepository implements KeepassRepositoryInterface
             $this->model = $this->model->newInstance();
             $this->model->title = Arr::get($attributes, 'title', 'no_title');
             $this->model->category_id = Arr::get($attributes, 'category_id');
+            $this->model->private_category_id = Arr::get($attributes, 'private_category_id');
             $this->model->is_folder = Arr::get($attributes, 'is_folder');
             $this->model->parent_id = Arr::get($attributes, 'parent_id');
             $this->model->login = Arr::get($attributes, 'login');
@@ -50,6 +51,7 @@ class KeepassRepository implements KeepassRepositoryInterface
             $entity->update([
                 'title' => Arr::get($attributes, 'title'),
                 'category_id' => Arr::get($attributes, 'category_id'),
+                'private_category_id' => Arr::get($attributes, 'private_category_id'),
                 'is_folder' => Arr::get($attributes, 'is_folder'),
                 'parent_id' => Arr::get($attributes, 'parent_id'),
                 'login' => Arr::get($attributes, 'login'),
@@ -73,12 +75,12 @@ class KeepassRepository implements KeepassRepositoryInterface
         // TODO: Implement get() method.
     }
 
-    public function createMultiple(array $keepasses, $category_id) : array
+    public function createMultiple(array $keepasses, $category_id, bool $isPrivate) : array
     {
         $storedKeepasses = [];
-        DB::transaction(function () use ($keepasses, $category_id, &$storedKeepasses) {
+        DB::transaction(function () use ($keepasses, $category_id, &$storedKeepasses, $isPrivate) {
             foreach ($keepasses as $keepass) {
-                $keepass['category_id'] = $category_id;
+                $keepass[$isPrivate ? 'private_category_id' : 'category_id'] = $category_id;
                 $createdKeepass = $this->create($keepass);
                 $createdKeepass->password = $createdKeepass->password ? decrypt($createdKeepass->password) : null;
                 array_push($storedKeepasses, $createdKeepass);
@@ -88,10 +90,10 @@ class KeepassRepository implements KeepassRepositoryInterface
         return $storedKeepasses;
     }
 
-    public function getStructuredItems($category_id)
+    public function getStructuredItems($category_id, bool $isPrivate)
     {
 
-        $rootFolders = Keepass::where('category_id', '=', $category_id)->where('is_folder', 1)
+        $rootFolders = Keepass::where($isPrivate ? 'private_category_id' : 'category_id', '=', $category_id)->where('is_folder', 1)
         ->where('parent_id', null)->get()->toArray();
 
         //TODO using it and splice the collection shows a slightly better performance but needs to find a correct way to splice...
@@ -106,10 +108,16 @@ class KeepassRepository implements KeepassRepositoryInterface
 
     public function getStructuredEntryItems(Keepass $keepass)
     {
-        $rootFolders = Keepass::where('category_id', '=', $keepass->category_id)->where('is_folder', 1)
+        $query = Keepass::where('is_folder', 1)
             ->where('id', $keepass->id)->get()->toArray();
 
-        return $this->setStructureRecusively([], $rootFolders);
+        if ($keepass->private_category_id) {
+            $query->where('private_category_id', '=', $keepass->private_category_id);
+        } else {
+            $query->where('category_id', '=', $keepass->category_id);
+        }
+
+        return $this->setStructureRecusively([], $query->get()->toArray());
     }
 
     private function setStructureRecusively($allItems, array &$folders)
@@ -190,7 +198,7 @@ class KeepassRepository implements KeepassRepositoryInterface
     public function getHistoric(array $parameters = [])
     {
         /** @var Builder $query */
-        $query = Keepass::withTrashed();
+        $query = Keepass::notPrivate()->withTrashed();
 
         if (Arr::has($parameters, 'sortBy')) {
             switch (Arr::get($parameters, 'sortBy')) {

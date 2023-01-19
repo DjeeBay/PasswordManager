@@ -1,5 +1,5 @@
 <template>
-    <button v-on:click="openDeleteModal()" type="button" class="btn btn-danger rounded"><i class="cui-trash"></i></button>
+    <button v-on:click="openDeleteModal()" type="button" class="btn btn-danger rounded"><i class="cil-trash"></i></button>
 </template>
 
 <script>

@@ -3,8 +3,8 @@
         <div class="card-header bg-primary">
             <img v-if="keepassComputed.icon_id && keepassComputed.icon" :src="'/storage/'+keepassComputed.icon.path" :alt="keepassComputed.icon.filename" class="mr-1 float-left" height="20" width="20">
             {{keepass.id ? 'Edit' : 'New'}} {{keepass.title}}
-            <span v-on:click="$emit('close')" class="float-right handHover"><i class="cui-x ml-3"></i></span>
-            <button v-popover:entryIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cui-smile"></i></button>
+            <span v-on:click="$emit('close')" class="float-right handHover"><i class="cil-x ml-3"></i></span>
+            <button v-popover:entryIcon.bottom type="button" class="btn btn-sm btn-warning float-right"><i class="cil-smile"></i></button>
             {{keepass.icon_id}}
             <icons-popover @icon-changed="updateIcon" :icons="icons" :keepass="keepass" :popover-name="'entryIcon'" :save-route="saveRoute"></icons-popover>
         </div>
@@ -27,10 +27,10 @@
                         <label>Password</label>
                         <input :type="showPassword ? 'text' : 'password'" v-model="keepassComputed.password" class="form-control" autocomplete="new-password">
                         <div class="mt-1">
-                            <button v-on:click="showPassword = !showPassword" type="button" class="btn btn-sm btn-secondary"><i :class="[showPassword ? 'cui-lock-unlocked' : 'cui-lock-locked']"></i></button>
+                            <button v-on:click="showPassword = !showPassword" type="button" class="btn btn-sm btn-secondary"><i :class="[showPassword ? 'cil-lock-unlocked' : 'cil-lock-locked']"></i></button>
                             <button v-on:click="generatePassword" type="button" class="btn btn-sm btn-dark">Generate ({{passwordLength}})</button>
-                            <button v-on:click="passwordLength++" type="button" class="btn btn-sm btn-dark"><i class="cui-caret-top"></i></button>
-                            <button v-on:click="passwordLength > 5 ? passwordLength-- : null" type="button" class="btn btn-sm btn-dark"><i class="cui-caret-bottom"></i></button>
+                            <button v-on:click="passwordLength++" type="button" class="btn btn-sm btn-dark"><i class="cil-caret-top"></i></button>
+                            <button v-on:click="passwordLength > 5 ? passwordLength-- : null" type="button" class="btn btn-sm btn-dark"><i class="cil-caret-bottom"></i></button>
                         </div>
                     </div>
                 </div>

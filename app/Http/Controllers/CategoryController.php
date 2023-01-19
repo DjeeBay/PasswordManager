@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Category\SaveCategoryRequest;
+use App\Interfaces\CategoryRepositoryInterface;
 use App\Models\Category;
 use App\Models\User;
 use App\Repositories\CategoryRepository;
@@ -10,8 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
-    /** @var CategoryRepository $repository */
-    protected $repository;
+    protected CategoryRepositoryInterface $repository;
 
     public function __construct(CategoryRepository $categoryRepository)
     {

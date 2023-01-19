@@ -6,7 +6,7 @@
                     <button v-on:click="saveIcon(null)" type="button" class="btn btn-light btn-block">Default</button>
                 </div>
                 <div class="col-2">
-                    <button v-on:click="toggleInput" type="button" class="btn btn-ghost-light"><i :class="[showAddIconInput ? 'cui-minus' : 'cui-plus']"></i></button>
+                    <button v-on:click="toggleInput" type="button" class="btn btn-ghost-light"><i :class="[showAddIconInput ? 'cil-minus' : 'cil-plus']"></i></button>
                 </div>
             </div>
             <div v-if="showAddIconInput" class="row">
@@ -14,7 +14,7 @@
                     <input type="file" class="form-control-file form-control-sm" accept="image/png" @change="setIcon">
                 </div>
                 <div class="col-2">
-                    <button v-if="file" type="button" v-on:click="storeIcon" class="btn btn-sm btn-success"><i class="cui-save"></i></button>
+                    <button v-if="file" type="button" v-on:click="storeIcon" class="btn btn-sm btn-success"><i class="cil-save"></i></button>
                 </div>
             </div>
             <div class="row">

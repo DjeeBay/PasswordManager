@@ -19,14 +19,15 @@
             <div class="row">
                 <div class="col-md-12">
                     <keepass-wrapper
-                        add-favorites-route="{{route('favorite.add-multiple')}}"
+                        add-favorites-route="{{route($isPrivate ? 'favorite.add-multiple-private' : 'favorite.add-multiple')}}"
                         :confirm-delay-in-seconds="{{env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') >= 1 ? env('KEEPASS_CONFIRM_DELETE_DELAY_IN_SECONDS') : 5}}"
                         :category-id="{{$category->id}}"
                         :icon-list='@json(\App\Models\Icon::all())'
                         :items='@json($items)'
-                        :entry-mode="{{\Illuminate\Support\Facades\Route::currentRouteName() === 'keepass.get_entry' ? 'true' : 'false'}}"
-                        save-route="{{route('keepass.save', $category->id)}}"
-                        create-multiple-route="{{route('keepass.create-multiple', $category->id)}}"
+                        :entry-mode="{{\Illuminate\Support\Facades\Route::currentRouteName() === 'keepass.get_entry' || \Illuminate\Support\Facades\Route::currentRouteName() === 'keepass.get_private_entry' ? 'true' : 'false'}}"
+                        save-route="{{route($isPrivate ? 'keepass.save_private' : 'keepass.save', $category->id)}}"
+                        create-multiple-route="{{route($isPrivate ? 'keepass.create-multiple-private' : 'keepass.create-multiple', $category->id)}}"
+                        :is-private='{{$isPrivate ? 'true' : 'false'}}'
                     ></keepass-wrapper>
                 </div>
             </div>

@@ -39,11 +39,11 @@
                     <tr>
                         <th scope="col">Title</th>
                         <th scope="col">Category</th>
-                        <th scope="col"><a href="{{route('historic.index', ['sortBy' => 'created', 'category' => Request()->category, 'title' => Request()->title])}}">Created at</a> @if(Request()->sortBy === 'created')<i class="cui-chevron-bottom text-warning"></i>@endif</th>
+                        <th scope="col"><a href="{{route('historic.index', ['sortBy' => 'created', 'category' => Request()->category, 'title' => Request()->title])}}">Created at</a> @if(Request()->sortBy === 'created')<i class="cil-chevron-bottom text-warning"></i>@endif</th>
                         <th scope="col">Created by</th>
-                        <th scope="col"><a href="{{route('historic.index', ['sortBy' => 'updated', 'category' => Request()->category, 'title' => Request()->title])}}">Updated at</a> @if(Request()->sortBy === 'updated' || !Request()->sortBy)<i class="cui-chevron-bottom text-warning"></i>@endif</th>
+                        <th scope="col"><a href="{{route('historic.index', ['sortBy' => 'updated', 'category' => Request()->category, 'title' => Request()->title])}}">Updated at</a> @if(Request()->sortBy === 'updated' || !Request()->sortBy)<i class="cil-chevron-bottom text-warning"></i>@endif</th>
                         <th scope="col">Updated by</th>
-                        <th scope="col"><a href="{{route('historic.index', ['sortBy' => 'deleted', 'category' => Request()->category, 'title' => Request()->title])}}">Deleted at</a> @if(Request()->sortBy === 'deleted')<i class="cui-chevron-bottom text-warning"></i>@endif</th>
+                        <th scope="col"><a href="{{route('historic.index', ['sortBy' => 'deleted', 'category' => Request()->category, 'title' => Request()->title])}}">Deleted at</a> @if(Request()->sortBy === 'deleted')<i class="cil-chevron-bottom text-warning"></i>@endif</th>
                         <th scope="col">Deleted by</th>
                     </tr>
                     </thead>
