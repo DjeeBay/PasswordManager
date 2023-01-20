@@ -371,7 +371,7 @@
                         bodyText: 'It will delete the folder '+this.selection[0].title+' and all its children.',
                         confirmDelayInSeconds: this.confirmDelayInSeconds,
                         xhrData: {keepass: this.selection[0]},
-                        route: '/keepass/'+this.categoryId+'/delete/'+this.selection[0].id
+                        route: '/keepass/'+(this.isPrivate ? 'private/' : '')+this.categoryId+'/delete/'+this.selection[0].id
                     }, {adaptive: true})
                 }
             },
