@@ -260,7 +260,6 @@ class KeepassController extends Controller
         $attributes[$isPrivate ? 'private_category_id' : 'category_id'] = $category_id;
         $attributes[$isPrivate ? 'category_id' : 'private_category_id'] = null;
         $keepass = !$request->has('keepass.id') || !$request->json('keepass.id') ? $this->repository->create($attributes) : $this->repository->update(Keepass::findOrFail($request->json('keepass.id')), $attributes);
-        $keepass->password = $keepass->password ? decrypt($keepass->password) : null;
 
         return response()->json(['keepass' => $keepass]);
     }

@@ -40,6 +40,14 @@
                         </div>
 
                         <div class="form-group row">
+                            <label for="passphrase" class="col-md-4 col-form-label text-md-right">{{ __('Passphrase') }} <span data-toggle="tooltip" data-placement="top" title="Allows you to encrypt/decrypt your private passwords"><i class="fa fa-question-circle text-black-50 handHover"></i></span></label>
+
+                            <div class="col-md-6">
+                                <input id="passphrase" type="password" class="form-control" name="passphrase">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <div class="col-md-6 offset-md-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>

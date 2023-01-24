@@ -47,8 +47,10 @@
                         {{html()->text('name', old('name'))->class('form-control')->placeholder('name')->required()}}
                     </div>
                 </div>
+            </div>
 
-                @if ((isset($user) && (Auth::user()->id === $user->id || Auth::user()->is_admin)) || !isset($user))
+            @if ((isset($user) && (Auth::user()->id === $user->id || Auth::user()->is_admin)) || !isset($user))
+                <div class="row border-danger b-a-2">
                     <div class="col-md-6">
                         <div class="form-group">
                             {{html()->label('Password (min. 8)', 'password')}}
@@ -61,8 +63,26 @@
                             {{html()->password('password_confirmation')->class('form-control')->placeholder('password confirmation')->required(!isset($user))}}
                         </div>
                     </div>
-                @endif
-            </div>
+                    @if (isset($user))
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{html()->label('Passphrase', 'passphrase')}}
+                                {{html()->password('passphrase')->class('form-control')->placeholder('passphrase')->attribute('autocomplete', 'off')}}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            @if (isset($user) && $user->id === \Illuminate\Support\Facades\Auth::user()->id)
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#passphraseModal">
+                            Change passphrase
+                        </button>
+                    </div>
+                </div>
+            @endif
 
             @if (Auth::user()->is_admin)
                 <hr>
@@ -209,5 +229,56 @@
             {{html()->submit('Save')->class('btn btn-success')}}
         </div>
         {{html()->closeModelForm()}}
+
+        @if (isset($user) && \Illuminate\Support\Facades\Auth::user()->id === $user->id)
+            <!-- Modal -->
+            {{html()->form('POST', route('user.update_passphrase', ['id' => $user]))->class('needs-validation')->novalidate()->open()}}
+                <div class="modal modal-danger fade" id="passphraseModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="passphraseModalLabel">Change your passphrase</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="p-2 bg-dark text-white font-weight-bold font-lg">
+                                    <i class="fa fa-warning text-danger"></i> Be careful, you should keep your passphrase carefully. Losing it means losing all your private passwords.
+                                    <br>There is no way to recover your passphrase and so there will be no way to recover your private passwords.
+                                </p>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            {{html()->label('Old Passphrase', 'old_passphrase')}}
+                                            {{html()->password('old_passphrase')->class('form-control')->placeholder('old passphrase')}}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            {{html()->label('New Passphrase', 'new_passphrase')}}
+                                            {{html()->password('new_passphrase')->class('form-control')->placeholder('new passphrase')->required()}}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            {{html()->label('New Passphrase Confirmation', 'new_passphrase_confirmation')}}
+                                            {{html()->password('new_passphrase_confirmation')->class('form-control')->placeholder('new passphrase confirmation')->required()}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="p-2 border-info b-a-2">
+                                    <i class="fa fa-info-circle text-info"></i> Your passphrase is used to encrypt all your private passwords. It provides a better security level, preventing your private passwords from being decrypted even if your account has been hacked.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-danger">Save new passphrase</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{html()->form()->close()}}
+        @endif
     </div>
 @endsection

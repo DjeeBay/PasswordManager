@@ -3,21 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\SaveUserRequest;
+use App\Http\Requests\User\UpdatePassphraseRequest;
+use App\Interfaces\KeepassRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\Category;
 use App\Models\User;
+use App\Repositories\KeepassRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use MongoDB\Driver\Session;
 
 class UserController extends Controller
 {
     /** @var UserRepositoryInterface $repository */
     protected $repository;
 
-    public function __construct(UserRepository $userRepository)
+    private KeepassRepositoryInterface $keepassRepository;
+
+    public function __construct(UserRepository $userRepository, KeepassRepository $keepassRepository)
     {
         $this->repository = $userRepository;
+        $this->keepassRepository = $keepassRepository;
     }
 
     /**
@@ -110,9 +118,15 @@ class UserController extends Controller
             return back()
                 ->withErrors(['Passwords must be identical']);
         }
-        $attributes = $request->all();
         /** @var User $user */
         $user = User::find($id);
+        if ($request->password && $user->passphrase_validator && !Hash::check($request->passphrase, $user->passphrase_validator)) {
+            return back()
+                ->withErrors(['Invalid passphrase']);
+        }
+
+        $attributes = $request->all();
+
         if (!Auth::user()->is_admin && !Auth::user()->can('manage user permissions')) {
             $attributes['is_admin'] = $user->is_admin;
             $attributes['permissions'] = [];
@@ -139,6 +153,29 @@ class UserController extends Controller
             session()->flash('success', 'User has been deleted.');
 
             return response()->json(['redirect' => route('user.index')]);
+        }
+    }
+
+    public function updatePassphrase(UpdatePassphraseRequest $request)
+    {
+        if (!env('KEEPASS_PASSPHRASE_VALIDATOR')) {
+            return back()
+                ->withErrors(['This KeepassManager is not configured to use the passphrase']);
+        }
+        $authUser = Auth::user();
+        if ($authUser->passphrase_validator && !Hash::check($request->old_passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $authUser->passphrase_validator)) {
+            return back()
+                ->withErrors(['The old passphrase is incorrect']);
+        }
+
+        try {
+            $this->keepassRepository->encryptPrivatePasswordsWithNewPassphrase($authUser, $request->old_passphrase, $request->new_passphrase);
+            \Illuminate\Support\Facades\Session::put('kpm.private_passphrase', $request->new_passphrase);
+            return redirect()->route('user.index')
+                ->withSuccess('Your passphrase has been updated. Please keep it safely.');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors([$e->getMessage()]);
         }
     }
 }
