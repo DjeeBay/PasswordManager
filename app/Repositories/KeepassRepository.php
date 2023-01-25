@@ -385,7 +385,7 @@ class KeepassRepository implements KeepassRepositoryInterface
         $length = $cipherLengths[strtolower(config('app.cipher'))];
         $valueLength = strlen($value);
         if ($valueLength === $length) return $value;
-        if ($value < $length) {
+        if ($valueLength < $length) {
             return str_pad($value, $length, "\0", STR_PAD_RIGHT);
         }
 

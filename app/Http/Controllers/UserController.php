@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\CheckPassphraseRequest;
 use App\Http\Requests\User\SaveUserRequest;
 use App\Http\Requests\User\UpdatePassphraseRequest;
 use App\Interfaces\KeepassRepositoryInterface;
@@ -120,7 +121,7 @@ class UserController extends Controller
         }
         /** @var User $user */
         $user = User::find($id);
-        if ($request->password && $user->passphrase_validator && !Hash::check($request->passphrase, $user->passphrase_validator)) {
+        if ($request->password && $user->passphrase_validator && !Hash::check($request->passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $user->passphrase_validator)) {
             return back()
                 ->withErrors(['Invalid passphrase']);
         }
@@ -177,5 +178,18 @@ class UserController extends Controller
             return back()
                 ->withErrors([$e->getMessage()]);
         }
+    }
+
+    public function checkPassphrase(CheckPassphraseRequest $request)
+    {
+        if (!Hash::check($request->passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), Auth::user()->passphrase_validator)) {
+            return back()
+                ->withErrors(['The passphrase is incorrect']);
+        }
+
+        \Illuminate\Support\Facades\Session::put('kpm.private_passphrase', $request->passphrase);
+
+        return back()
+            ->withSuccess('Your passphrase has been verified.');
     }
 }

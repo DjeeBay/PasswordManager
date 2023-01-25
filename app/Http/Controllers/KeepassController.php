@@ -21,6 +21,8 @@ use App\Models\PrivateCategory;
 use App\Repositories\KeepassRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class KeepassController extends Controller
 {
@@ -41,6 +43,10 @@ class KeepassController extends Controller
 
     public function getPrivate(GetPrivateKeepassRequest $request, $category_id)
     {
+        if (Auth::user()->passphrase_validator && !Hash::check(Session::get('kpm.private_passphrase').env('KEEPASS_PASSPHRASE_VALIDATOR'), Auth::user()->passphrase_validator)) {
+            return back()
+                ->withErrors(['Incorrect passphrase']);
+        }
         return $this->getKeepass($category_id, true);
     }
 
