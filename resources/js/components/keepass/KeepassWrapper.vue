@@ -388,6 +388,7 @@
                         keepass: keepass,
                         saveRoute: this.saveRoute,
                         isPassphraseEnabled: this.isPassphraseEnabled,
+                        isPrivate: this.isPrivate
                     }
                     this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', clickToClose: false, classes: 'v--modal overflowAuto modalMaxHeight'})
                 }

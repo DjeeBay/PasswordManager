@@ -9,7 +9,7 @@
             <icons-popover @icon-changed="updateIcon" :icons="icons" :keepass="keepass" :popover-name="'entryIcon'" :save-route="saveRoute"></icons-popover>
         </div>
         <div class="card-body">
-            <h6 v-if="!isPassphraseEnabled" class="card-title bg-danger p-2">Please consider providing a passphrase to ensure your private passwords are securely stored.</h6>
+            <h6 v-if="isPrivate && !isPassphraseEnabled" class="card-title bg-danger p-2">Please consider providing a passphrase to ensure your private passwords are securely stored.</h6>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -83,6 +83,10 @@
                 default: []
             },
             isPassphraseEnabled: {
+                type: Boolean,
+                required: true
+            },
+            isPrivate: {
                 type: Boolean,
                 required: true
             },
