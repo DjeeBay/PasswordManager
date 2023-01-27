@@ -16,7 +16,7 @@
             {{$category->name}}
         </div>
         <div class="card-body">
-            @if (!\Illuminate\Support\Facades\Auth::user()->passphrase_validator)
+            @if ($isPrivate && !\Illuminate\Support\Facades\Auth::user()->passphrase_validator)
                 <h5 class="card-title bg-danger p-2">Please consider providing a passphrase to ensure your private passwords are securely stored. <a class="text-warning" href="{{route('user.edit', \Illuminate\Support\Facades\Auth::user()->id)}}">Click here</a></h5>
             @endif
             <div class="row">

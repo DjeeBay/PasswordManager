@@ -9,15 +9,25 @@ use App\Interfaces\FavoriteRepositoryInterface;
 use App\Models\Category;
 use App\Models\PrivateCategory;
 use App\Models\UserCategory;
+use App\Services\PassphraseService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class FavoriteRepository implements FavoriteRepositoryInterface
 {
+    private PassphraseService $passphraseService;
+
+    public function __construct(PassphraseService $passphraseService)
+    {
+        $this->passphraseService = $passphraseService;
+    }
 
     public function create(array $attributes = []): Model
     {
@@ -41,15 +51,20 @@ class FavoriteRepository implements FavoriteRepositoryInterface
 
     public function getList() : Collection
     {
+        $privateEncrypter = $this->passphraseService->getPrivateEncrypter();
+
         $favorites = Favorite::with('keepass')
             ->where('user_id', '=', Auth::user()->id)
             ->whereHas('keepass', function (Builder $q) {
                 $q->whereNull('deleted_at');
             })
             ->get();
-        $favorites->each(function ($item) {
+        $favorites->each(function ($item) use ($privateEncrypter) {
             $item->keepass->fullpath = $item->keepass->fullpath;
-            $item->keepass->password = $item->keepass->password ? decrypt($item->keepass->password) : null;
+            $item->keepass->password = $item->keepass->password ?
+                (!$item->keepass->private_category_id ? decrypt($item->keepass->password)
+                    : ($privateEncrypter?->decrypt($item->keepass->password)))
+                : null;
         });
 
         return $favorites;
@@ -76,5 +91,12 @@ class FavoriteRepository implements FavoriteRepositoryInterface
                 Favorite::insert($favorites);
             }
         });
+    }
+
+    private function getPrivateEncrypter()
+    {
+        $user = Auth::user();
+
+        return $user->passphrase_validator && Hash::check(Session::get('kpm.private_passphrase').env('KEEPASS_PASSPHRASE_VALIDATOR'), $user->passphrase_validator) ? new Encrypter($this->getPassphraseWithCorrectLength(Session::get('kpm.private_passphrase')), config('app.cipher')) : null;
     }
 }
