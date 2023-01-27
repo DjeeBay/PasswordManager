@@ -148,6 +148,10 @@
                 required: false,
                 default: []
             },
+            isPassphraseEnabled: {
+                type: Boolean,
+                required: true
+            },
             isPrivate: {
                 type: Boolean,
                 required: true
@@ -383,6 +387,7 @@
                         icons: this.icons,
                         keepass: keepass,
                         saveRoute: this.saveRoute,
+                        isPassphraseEnabled: this.isPassphraseEnabled,
                     }
                     this.$modal.show(EditKeepassModal, props, {adaptive: true, height: 'auto', clickToClose: false, classes: 'v--modal overflowAuto modalMaxHeight'})
                 }

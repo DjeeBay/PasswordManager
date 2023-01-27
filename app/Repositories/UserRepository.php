@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -54,7 +55,6 @@ class UserRepository implements UserRepositoryInterface
                 'is_admin' => Arr::get($attributes, 'is_admin', 0),
                 'email' => Arr::get($attributes, 'email')
             ]);
-//            dd(Arr::get($attributes, 'categories'));
 
             /** @var User $entity */
             $entity->syncPermissions(Arr::get($attributes, 'permissions'));
