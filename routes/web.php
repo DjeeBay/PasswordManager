@@ -24,6 +24,8 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/home', 'HomeController@index')->name('home');
 
+    Route::post('user/check-passphrase', [UserController::class, 'checkPassphrase'])->name('user.check_passphrase');
+    Route::post('user/update-passphrase/{id}', [UserController::class, 'updatePassphrase'])->name('user.update_passphrase');
     Route::resource('/user', UserController::class);
     Route::resource('/category', CategoryController::class);
     Route::resource('/private-category', PrivateCategoryController::class);

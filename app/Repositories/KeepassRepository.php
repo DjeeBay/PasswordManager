@@ -7,12 +7,17 @@ use App\Interfaces\KeepassRepositoryInterface;
 use App\Models\Category;
 use App\Models\Icon;
 use App\Models\Keepass;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class KeepassRepository implements KeepassRepositoryInterface
 {
@@ -27,19 +32,33 @@ class KeepassRepository implements KeepassRepositoryInterface
     {
         $entity = null;
         DB::transaction(function () use ($attributes, &$entity) {
+            $privateCategoryId = Arr::get($attributes, 'private_category_id');
+            $isPrivate = (bool)$privateCategoryId;
+            $passphraseValidator = Auth::user()->passphrase_validator;
+            $passphrase = Session::get('kpm.private_passphrase');
+            if (env('KEEPASS_PASSPHRASE_VALIDATOR') && $isPrivate && $passphraseValidator && !Hash::check($passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $passphraseValidator)) {
+                throw new \Exception('Incorrect passphrase');
+            }
+            $isPassphraseRequired = env('KEEPASS_PASSPHRASE_VALIDATOR') && $isPrivate && $passphraseValidator;
+            $privateEncrypter = $isPassphraseRequired ? $this->getPrivateEncrypter() : null;
+
             $this->model = $this->model->newInstance();
             $this->model->title = Arr::get($attributes, 'title', 'no_title');
             $this->model->category_id = Arr::get($attributes, 'category_id');
-            $this->model->private_category_id = Arr::get($attributes, 'private_category_id');
+            $this->model->private_category_id = $privateCategoryId;
             $this->model->is_folder = Arr::get($attributes, 'is_folder');
             $this->model->parent_id = Arr::get($attributes, 'parent_id');
             $this->model->login = Arr::get($attributes, 'login');
-            $this->model->password = Arr::get($attributes, 'password') ? encrypt(Arr::get($attributes, 'password')) : null;
+            $this->model->password = Arr::get($attributes, 'password') ? ($isPassphraseRequired ? $privateEncrypter->encrypt(Arr::get($attributes, 'password')) : encrypt(Arr::get($attributes, 'password'))) : null;
             $this->model->url = Arr::get($attributes, 'url');
             $this->model->notes = Arr::get($attributes, 'notes');
             $this->model->icon_id = Arr::get($attributes, 'icon_id');
             $this->model->save();
             $entity = $this->model;
+
+            if ($entity->password) {
+                $entity->password = $isPassphraseRequired ? $privateEncrypter->decrypt($entity->password) : decrypt($entity->password);
+            }
         });
 
         return $entity;
@@ -48,18 +67,33 @@ class KeepassRepository implements KeepassRepositoryInterface
     public function update(Model $entity, array $attributes = []): Model
     {
         DB::transaction(function () use (&$entity, $attributes) {
+            $privateCategoryId = Arr::get($attributes, 'private_category_id');
+            $isPrivate = (bool)$privateCategoryId;
+            $passphraseValidator = Auth::user()->passphrase_validator;
+            $passphrase = Session::get('kpm.private_passphrase');
+            if (env('KEEPASS_PASSPHRASE_VALIDATOR') && $isPrivate && $passphraseValidator && !Hash::check($passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $passphraseValidator)) {
+                throw new \Exception('Incorrect passphrase');
+            }
+            $isPassphraseRequired = env('KEEPASS_PASSPHRASE_VALIDATOR') && $isPrivate && $passphraseValidator;
+            $privateEncrypter = $isPassphraseRequired ? $this->getPrivateEncrypter() : null;
+
+
             $entity->update([
                 'title' => Arr::get($attributes, 'title'),
                 'category_id' => Arr::get($attributes, 'category_id'),
-                'private_category_id' => Arr::get($attributes, 'private_category_id'),
+                'private_category_id' => $privateCategoryId,
                 'is_folder' => Arr::get($attributes, 'is_folder'),
                 'parent_id' => Arr::get($attributes, 'parent_id'),
                 'login' => Arr::get($attributes, 'login'),
-                'password' => Arr::get($attributes, 'password') ? encrypt(Arr::get($attributes, 'password')) : null,
+                'password' => Arr::get($attributes, 'password') ? ($isPassphraseRequired ? $privateEncrypter->encrypt(Arr::get($attributes, 'password')) : encrypt(Arr::get($attributes, 'password'))) : null,
                 'url' => Arr::get($attributes, 'url'),
                 'notes' => Arr::get($attributes, 'notes'),
                 'icon_id' => Arr::get($attributes, 'icon_id'),
             ]);
+
+            if ($entity->password) {
+                $entity->password = $isPassphraseRequired ? $privateEncrypter->decrypt($entity->password) : decrypt($entity->password);
+            }
         });
 
         return $entity;
@@ -82,12 +116,49 @@ class KeepassRepository implements KeepassRepositoryInterface
             foreach ($keepasses as $keepass) {
                 $keepass[$isPrivate ? 'private_category_id' : 'category_id'] = $category_id;
                 $createdKeepass = $this->create($keepass);
-                $createdKeepass->password = $createdKeepass->password ? decrypt($createdKeepass->password) : null;
-                array_push($storedKeepasses, $createdKeepass);
+                $createdKeepass->password = $createdKeepass->password ? ($isPrivate ? $this->getPrivateEncrypter()->decrypt($createdKeepass->password) : decrypt($createdKeepass->password)) : null;
+                $storedKeepasses[] = $createdKeepass;
             }
         });
 
         return $storedKeepasses;
+    }
+
+    public function encryptPrivatePasswordsWithNewPassphrase(User $user, ?string $oldPassphrase, string $newPassphrase) : void
+    {
+        DB::transaction(function () use ($user, $oldPassphrase, $newPassphrase) {
+            $passphraseValidator = $user->passphrase_validator;
+            if ($passphraseValidator && !Hash::check($oldPassphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $passphraseValidator)) {
+                throw new \Exception('Incorrect passphrase');
+            }
+
+            $oldPassphraseWithCorrectLength = $oldPassphrase ? $this->getPassphraseWithCorrectLength($oldPassphrase) : null;
+            $newPassphraseWithCorrectLength = $this->getPassphraseWithCorrectLength($newPassphrase);
+
+            $oldEncrypter = $oldPassphrase && $oldPassphraseWithCorrectLength ? new Encrypter($oldPassphraseWithCorrectLength, config('app.cipher')) : null;
+            $newEncrypter = new Encrypter($newPassphraseWithCorrectLength, config('app.cipher'));
+
+            $keepasses = Keepass::join('private_categories as pc', 'pc.id', '=', 'keepasses.private_category_id')
+                ->select('keepasses.*')
+                ->where([
+                    ['pc.owner_id', '=', $user->id],
+                    ['keepasses.is_folder', '=', 0],
+                ])
+                ->whereNotNull('private_category_id')
+                ->whereNotNull('password')
+                ->get();
+
+            foreach ($keepasses as $entry) {
+                $pwdDecrypted = $oldPassphrase ? $oldEncrypter->decrypt($entry->password) : decrypt($entry->password);
+                $entry->password = $newEncrypter->encrypt($pwdDecrypted);
+                $entry->save();
+            }
+
+            $newPassphraseValidator = Hash::make($newPassphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'));
+            $storedUser = User::findOrFail($user->id);
+            $storedUser->passphrase_validator = $newPassphraseValidator;
+            $storedUser->save();
+        });
     }
 
     public function getStructuredItems($category_id, bool $isPrivate)
@@ -103,7 +174,7 @@ class KeepassRepository implements KeepassRepositoryInterface
 //            ->get();
 
 
-        return $this->setStructureRecusively([], $rootFolders);
+        return $this->setStructureRecusively([], $rootFolders, $isPrivate);
     }
 
     public function getStructuredEntryItems(Keepass $keepass)
@@ -119,24 +190,26 @@ class KeepassRepository implements KeepassRepositoryInterface
 
 		$folders = $query->get()->toArray();
 
-        return $this->setStructureRecusively([], $folders);
+        return $this->setStructureRecusively([], $folders, (bool)$keepass->private_category_id);
     }
 
-    private function setStructureRecusively($allItems, array &$folders)
+    private function setStructureRecusively($allItems, array &$folders, bool $isPrivate)
     {
+        $encrypter = $isPrivate ? $this->getPrivateEncrypter() : null;
         $foldersIDS = array_column($folders, 'id');
         $allItems = DB::table('keepasses')->whereNull(['deleted_at', 'deleted_by'])->whereIn('parent_id', $foldersIDS)->get();
+
         foreach ($folders as &$folder) {
             $folder = (array) $folder;
             $children = [];
             foreach ($allItems as $item) {
                 if ($item->parent_id === $folder['id']) {
-                    $item->password = $item->password ? decrypt($item->password) : null;
-                    array_push($children, $item);
+                    $item->password = $item->password ? ($isPrivate && $encrypter ? $encrypter->decrypt($item->password) : decrypt($item->password)) : null;
+                    $children[] = $item;
                 }
             }
             $folder['children'] = $children;
-            $this->setStructureRecusively($allItems, $folder['children']);
+            $this->setStructureRecusively($allItems, $folder['children'], $isPrivate);
         }
 
         return $folders;
@@ -298,5 +371,31 @@ class KeepassRepository implements KeepassRepositoryInterface
                 $this->createKeepassesRecursively($keepassRepository, $category, $children, $icons, $folder->id);
             }
         }
+    }
+
+    private function getPassphraseWithCorrectLength(string $value) : string
+    {
+        $cipherLengths = [
+            'aes-128-cbc' => 16,
+            'aes-256-cbc' => 32,
+            'aes-128-gcm' => 16,
+            'aes-256-gcm' => 32,
+        ];
+
+        $length = $cipherLengths[strtolower(config('app.cipher'))];
+        $valueLength = strlen($value);
+        if ($valueLength === $length) return $value;
+        if ($valueLength < $length) {
+            return str_pad($value, $length, "\0", STR_PAD_RIGHT);
+        }
+
+        return substr($value, 0, 32);
+    }
+
+    private function getPrivateEncrypter()
+    {
+        $user = Auth::user();
+
+        return $user->passphrase_validator && Hash::check(Session::get('kpm.private_passphrase').env('KEEPASS_PASSPHRASE_VALIDATOR'), $user->passphrase_validator) ? new Encrypter($this->getPassphraseWithCorrectLength(Session::get('kpm.private_passphrase')), config('app.cipher')) : null;
     }
 }
