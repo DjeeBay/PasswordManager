@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TwoFactorController extends Controller
 {
@@ -13,6 +15,12 @@ class TwoFactorController extends Controller
         ]);
 
         $activated = $request->user()->confirmTwoFactorAuth($request->code);
-        dd($activated);
+		if ($activated) {
+
+		}
+
+		//TODO logout
+
+		return redirect()->route('home');
     }
 }

@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                {{ html()->form('POST', route('2fa.confirm',  \Illuminate\Support\Facades\Auth::user()->id))->class('form-horizontal')->open() }}
+                {{ html()->form('POST', route('2fa.confirm',  $userId))->class('form-horizontal')->open() }}
                 <div class="card">
                     <div class="card-header">2FA</div>
                     <div class="card-body">
@@ -15,7 +15,7 @@
                             Code : {{$string}}
                         </div>
                         <div class="form-group">
-                            <label for="name">Confirmation code</label>
+                            <label for="code">Confirmation code</label>
                             <input class="form-input" type="number" name="code" required autofocus>
                         </div>
                     </div>
@@ -34,3 +34,4 @@
             </div>
         </div>
     </div>
+@endsection
