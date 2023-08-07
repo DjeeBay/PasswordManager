@@ -54,4 +54,6 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/favorite/removeMultiple', 'FavoriteController@removeMultiple')->name('favorite.remove-multiple');
     Route::post('/favorite/addMultiple', 'FavoriteController@addMultiple')->name('favorite.add-multiple');
     Route::post('/favorite/private/addMultiple', 'FavoriteController@addMultiplePrivate')->name('favorite.add-multiple-private');
+
+    Route::post('2fa/confirm', 'TwoFactorController@twoFactorConfirm')->name('2fa.confirm');
 });
