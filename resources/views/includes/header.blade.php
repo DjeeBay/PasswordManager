@@ -15,6 +15,13 @@
 
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav ml-auto">
+                    @if (env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false) && !\Illuminate\Support\Facades\Auth::user()->hasTwoFactorEnabled())
+                        <li class="nav-item dropdown px-3">
+                            <a class="nav-link text-primary" href="{{ route('2fa.prepare_per_user_two_factor') }}">
+                                <i class="fa fa-user-secret"></i> {{__('Enable 2FA')}}
+                            </a>
+                        </li>
+                    @endif
                     <li class="nav-item dropdown px-3">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                             {{ Auth::user()->name }} <span class="caret"></span>

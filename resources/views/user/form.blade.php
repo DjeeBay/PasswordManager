@@ -76,11 +76,18 @@
 
             @if (isset($user) && $user->id === \Illuminate\Support\Facades\Auth::user()->id)
                 <div class="row mt-2">
-                    <div class="col-12">
+                    <div class="col-6">
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#passphraseModal">
                             Change passphrase
                         </button>
                     </div>
+                    @if ($user->hasTwoFactorEnabled())
+                        <div class="col-6">
+                            <a href="{{route('2fa.get_recovery_codes')}}" type="button" class="btn btn-primary">
+                                2FA recovery codes
+                            </a>
+                        </div>
+                    @endif
                 </div>
             @endif
 
