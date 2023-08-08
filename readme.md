@@ -32,6 +32,7 @@ npm run prod
 ### How to
 
 You will have to create an admin account in database yourself by using standard Laravel password encryption (bcrypt function).
+Or you can execute php artisan db:seed --class=CreateAdminUserSeeder
 
 ### Main Technologies
 
