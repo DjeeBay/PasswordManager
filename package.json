@@ -30,7 +30,7 @@
         "vue": "^2.5.17",
         "vue-loader": "^15.9.8",
         "vue-template-compiler": "^2.6.10",
-        "webpack": "^5.76.0"
+        "webpack": "^5.88.2"
     },
     "dependencies": {
         "@bosket/core": "^0.4.4",
