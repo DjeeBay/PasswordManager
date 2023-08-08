@@ -23,7 +23,7 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function() {
     $allowedIp = env('2FA_IP_BYPASS');
-    $currentIp = $_SERVER['REMOTE_ADDR'];
+    $currentIp = \Illuminate\Support\Arr::get($_SERVER, 'REMOTE_ADDR');
     Route::middleware(env('ENABLE_TWO_FACTOR_AUTHENTICATION', false) && $currentIp !== $allowedIp ? '2fa.confirm' : 'auth')->group(function() {
         Route::get('/', 'HomeController@index')->name('home');
         Route::get('/home', 'HomeController@index')->name('home');
