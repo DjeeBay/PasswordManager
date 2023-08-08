@@ -11,7 +11,7 @@ class TwoFactorController extends Controller
 {
     public function twoFactorConfirm(Request $request, ConfigContract $config)
     {
-        if (!env('ENABLE_TWO_FACTOR_AUTHENTICATION', false)) {
+        if (!env('ENABLE_TWO_FACTOR_AUTHENTICATION', false) && !env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false)) {
             return redirect()->route('home');
         }
         $request->validate([
@@ -51,16 +51,8 @@ class TwoFactorController extends Controller
         if (!env('ENABLE_TWO_FACTOR_AUTHENTICATION', false)) {
             return redirect()->route('home');
         }
-        /** @var User $user */
-        $user = Auth::user();
-        $secret = $request->user()->createTwoFactorAuth();
 
-        return view('auth.two_factor', [
-            'userId' => $user->id,     // As QR Code
-            'qrCode' => $secret->toQr(),     // As QR Code
-            'uri'     => $secret->toUri(),    // As "otpauth://" URI.
-            'string'  => $secret->toString(), // As a string
-        ]);
+        return $this->prepareTwoFactorView($request);
     }
 
     private function extendSessionLifetime(Request $request, ConfigContract $config)
@@ -79,5 +71,30 @@ class TwoFactorController extends Controller
         }
 
         $request->session()->put("$key.confirm.expires_at", $time);
+    }
+
+    public function preparePerUserTwoFactor(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false) || $user->hasTwoFactorEnabled()) {
+            return redirect()->route('home');
+        }
+
+        return $this->prepareTwoFactorView($request);
+    }
+
+    private function prepareTwoFactorView(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        $secret = $request->user()->createTwoFactorAuth();
+
+        return view('auth.two_factor', [
+            'userId' => $user->id,
+            'qrCode' => $secret->toQr(),
+            'uri'     => $secret->toUri(),
+            'string'  => $secret->toString(),
+        ]);
     }
 }

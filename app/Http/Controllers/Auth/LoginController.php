@@ -45,6 +45,20 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    public function login(Request $request)
+    {
+        if (env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false)) {
+            $attempt = Auth2FA::attempt($request->only('email', 'password'));
+
+            if ($attempt) {
+                return $this->authenticatesUsersLogin($request);
+            }
+
+            return 'Hey, you should make an account!';
+        }
+        return $this->authenticatesUsersLogin($request);
+    }
+
     protected function authenticated(Request $request, $user)
     {
         if (Hash::check($request->passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $user->passphrase_validator)) {
