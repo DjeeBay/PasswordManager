@@ -171,7 +171,7 @@
                 deleteDelayInSeconds: 5,
                 interval: false,
                 keepassComputed: {},
-                passwordLength: 10,
+                passwordLength: 12,
                 percentage: 0,
                 showPassword: false
             }
