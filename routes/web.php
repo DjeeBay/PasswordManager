@@ -58,6 +58,9 @@ Route::middleware(['auth'])->group(function() {
         Route::post('/favorite/removeMultiple', 'FavoriteController@removeMultiple')->name('favorite.remove-multiple');
         Route::post('/favorite/addMultiple', 'FavoriteController@addMultiple')->name('favorite.add-multiple');
         Route::post('/favorite/private/addMultiple', 'FavoriteController@addMultiplePrivate')->name('favorite.add-multiple-private');
+
+        Route::get('prepare_per_user_two_factor', 'TwoFactorController@preparePerUserTwoFactor')->name('2fa.prepare_per_user_two_factor');
+        Route::get('2fa_recovery_codes', 'TwoFactorController@getTwoFactorRecoveryCodes')->name('2fa.get_recovery_codes');
     });
 
     Route::post('2fa/confirm', 'TwoFactorController@twoFactorConfirm')->name('2fa.confirm');
