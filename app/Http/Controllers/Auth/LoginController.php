@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laragear\TwoFactor\Facades\Auth2FA;
 
 class LoginController extends Controller
 {
@@ -21,7 +23,10 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers {
+        attemptLogin as authenticatesUsersAttemptLogin;
+		login as authenticatesUsersLogin;
+    }
 
     /**
      * Where to redirect users after login.
@@ -44,6 +49,19 @@ class LoginController extends Controller
     {
         if (Hash::check($request->passphrase.env('KEEPASS_PASSPHRASE_VALIDATOR'), $user->passphrase_validator)) {
             $request->session()->put('kpm.private_passphrase', $request->passphrase);
+        }
+
+        $allowedIp = env('2FA_IP_BYPASS');
+        $currentIp = $request->ip();
+        if (env('ENABLE_TWO_FACTOR_AUTHENTICATION', false) && $currentIp !== $allowedIp) {
+            /** @var User $user */
+            $user = Auth::user();
+            if (!$user->hasTwoFactorEnabled()) {
+                return redirect()->route('auth.two_factor');
+            } else {
+                Auth2FA::view('two-factor::confirm');
+                Auth2FA::attempt($request->only('email', 'password'), $request->filled('remember'));
+            }
         }
     }
 }

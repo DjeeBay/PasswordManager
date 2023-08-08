@@ -6,15 +6,18 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laragear\TwoFactor\Contracts\TwoFactorAuthenticatable;
+use Laragear\TwoFactor\TwoFactorAuthentication;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 use Wildside\Userstamps\Userstamps;
 
-class User extends Authenticatable
+class User extends Authenticatable implements TwoFactorAuthenticatable
 {
     use HasRoles,
         Notifiable,
         SoftDeletes,
+        TwoFactorAuthentication,
         Userstamps;
 
     /**
