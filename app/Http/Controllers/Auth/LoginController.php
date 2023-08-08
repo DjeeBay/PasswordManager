@@ -47,7 +47,9 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        if (env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false)) {
+        $bypassIp = env('2FA_IP_BYPASS');
+        $currentIp = $request->ip();
+        if (env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false) && $bypassIp !== $currentIp) {
             $attempt = Auth2FA::attempt($request->only('email', 'password'));
 
             if ($attempt) {

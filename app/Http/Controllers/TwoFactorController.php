@@ -55,6 +55,16 @@ class TwoFactorController extends Controller
         return $this->prepareTwoFactorView($request);
     }
 
+    public function getTwoFactorRecoveryCodes(Request $request)
+    {
+        if (!env('ENABLE_TWO_FACTOR_AUTHENTICATION', false) && !env('ENABLE_PER_USER_TWO_FACTOR_AUTHENTICATION', false)) {
+            return redirect()->route('home');
+        }
+
+        return view('auth.2fa_recovery_codes')
+            ->withCodes(Auth::user()->generateRecoveryCodes());
+    }
+
     private function extendSessionLifetime(Request $request, ConfigContract $config)
     {
         [
