@@ -120,7 +120,6 @@ class KeepassRepository implements KeepassRepositoryInterface
             foreach ($keepasses as $keepass) {
                 $keepass[$isPrivate ? 'private_category_id' : 'category_id'] = $category_id;
                 $createdKeepass = $this->create($keepass);
-                $createdKeepass->password = $createdKeepass->password ? ($isPrivate ? $this->passphraseService->getPrivateEncrypter()->decrypt($createdKeepass->password) : decrypt($createdKeepass->password)) : null;
                 $storedKeepasses[] = $createdKeepass;
             }
         });
