@@ -27,7 +27,7 @@
         "sass": "^1.20.1",
         "sass-loader": "^13.3.2",
         "serialize-javascript": ">=3.1.0",
-        "vue": "^2.5.17",
+        "vue": "^3.0.0",
         "vue-loader": "^15.10.0",
         "vue-template-compiler": "^2.6.10",
         "webpack": "^5.94.0"
