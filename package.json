@@ -10,7 +10,7 @@
         "production": "mix --production"
     },
     "devDependencies": {
-        "@babel/core": "^7.6.4",
+        "@babel/core": "^7.29.6",
         "@babel/preset-env": "^7.6.3",
         "axios": "^1.16",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
