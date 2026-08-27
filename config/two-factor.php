@@ -67,7 +67,7 @@ return [
 
     'confirm' => [
         'key' => '_2fa',
-        'time' => env('SESSION_LIFETIME', 60 * 3),
+        'time' => (int)env('SESSION_LIFETIME', 60 * 3),
     ],
 
     /*

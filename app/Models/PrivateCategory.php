@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Wildside\Userstamps\Userstamps;
+use Mattiverse\Userstamps\Traits\Userstamps;
 
 class PrivateCategory extends Model
 {
